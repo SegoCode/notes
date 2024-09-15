@@ -57,7 +57,7 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
      ```
      y copia toda la clave desde `-----BEGIN PUBLIC KEY-----` hasta `-----END PUBLIC KEY-----`. (Reemplaza `CLAVE_RECIEN_COPIADA` con tu ID de clave GPG.)
    - Ve a **GitHub > Settings > SSH and GPG keys > Bew GPG key** y pega tu **clave** pública GPG. Pusla  **Add GPG key**.
-     :::danger
+     :::caution
       Si ya tienes una clave instalada y la eliminas, se invalidara todos los commits
       firmados con esa clave. Varias claves pueden convivir.
      :::
@@ -93,6 +93,12 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
 ### Solución de Problemas
 - Revisa `.gitconfig` en tu directorio home si experimentas problemas.
 - Deberas de eliminar la carpeta .git en antiguos repositorios ya que contendrá antiguas firmas.
-- Variable `gpg.program`. Si Git no encuentra GPG, configura la ruta con `git config --global gpg.program ruta/a/gpg`.
+- Si Git no encuentra GPG revisa la variable `gpg.program`, configura la ruta con:  
+  ```
+  git config --global gpg.program ruta/a/gpg
+  ```
 - Asegúrate de que el email de Git coincida con el email de tu clave GPG y cuenta de GitHub.
-- Usa `git log --show-signature` para verificar firmas de commits.
+- Usa el siguiente comando para verificar firmas de commits:
+  ```
+  git log --show-signature
+   ```
