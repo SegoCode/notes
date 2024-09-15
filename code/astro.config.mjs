@@ -19,6 +19,8 @@ export default defineConfig({
 						// Each item here is one entry in the navigation menu.
 						{ slug: 'git/instalar' },
 						{ slug: 'git/firmar' },
+						{ slug: 'git/githooks' },
+						{ slug: 'git/conventional' },
 					],
 				},
 				{
