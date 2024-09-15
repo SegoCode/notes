@@ -20,21 +20,23 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
 <Steps>
 1. **Genera una Nueva clave GPG:**
 
-   - En la Terminal, escribe y ejecuta:
+   En la Terminal, escribe y ejecuta:
      ```
      gpg --full-generate-key
      ``` 
-   - Sigue las instrucciones en pantalla:
-     1. **Tipo de clave:** Selecciona RSA para la clave y presiona **Enter**.
-     2. **Tamaño de la clave:** Selecciona o escribe `4096` y presiona **Enter**.
-     3. **Duración de la clave:** Selecciona que la clave nunca expire y presiona **Enter**.
-     4. **Confirmación:** Confirma los detalles presionando `y` y luego **Enter**.
-     5. **Información Personal:** Ingresa tu `Nombre_Completo` y correo electrónico y no añadas ningún comentario.
-     6. **Contraseña de la clave:** Establece una contraseña segura y recuérdala.
+   Sigue las instrucciones en pantalla:
+   <Steps>
+   1. **Tipo de clave:** Selecciona RSA para la clave, presiona **Enter**.
+   2. **Tamaño de la clave:** Selecciona o escribe `4096`.
+   3. **Duración de la clave:** Selecciona que la clave nunca expire.
+   4. **Confirmación:** Confirma los detalles presionando `y`.
+   5. **Información Personal:** Ingresa tu `Nombre_Completo` y correo electrónico, no añadas ningún comentario.
+   6. **Contraseña de la clave:** Establece una contraseña segura y recuérdala.
+   </Steps>
 
 2. **Espera a que el proceso de generación se complete.**
-   
-   - Cuando termine, tendrás la clave generada en tu local y podemos continuar.
+     
+     Cuando termine, tendrás la clave generada en tu local y podemos continuar.
 </Steps>
 
 ### Configuración de Git para usar tu clave GPG
@@ -42,7 +44,8 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
 <Steps>
 1. **Lista tus claves GPG y encuentra el ID de tu nueva clave:**
 
-   - Escribe y ejecuta:
+    Escribe y ejecuta:
+
      ```
      gpg --list-secret-keys --keyid-format=long
      ```
@@ -50,32 +53,32 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
 
 2. **Exporta tu clave Pública GPG:**
 
-   - Escribe y ejecuta:
-     ```
-     gpg --armor --export CLAVE_RECIEN_COPIADA
-     ```
-     y copia toda la clave desde `-----BEGIN PUBLIC KEY-----` hasta `-----END PUBLIC KEY-----`. (Reemplaza `CLAVE_RECIEN_COPIADA` con tu ID de clave GPG.)
-   - Ve a **GitHub > Settings > SSH and GPG keys > Bew GPG key** y pega tu **clave** pública GPG. Pusla  **Add GPG key**.
-     :::caution
-      Si ya tienes una clave instalada y la eliminas, se invalidara todos los commits
-      firmados con esa clave. Varias claves pueden convivir.
-     :::
+   Escribe y ejecuta (Reemplaza `CLAVE_RECIEN_COPIADA` con tu ID de clave GPG):
+   ```
+   gpg --armor --export CLAVE_RECIEN_COPIADA
+   ```
+   y copia toda la clave desde `-----BEGIN PUBLIC KEY-----` hasta `-----END PUBLIC KEY-----`.
+   
+   Ve a **GitHub > Settings > SSH and GPG keys > Bew GPG key** y pega tu **clave** pública GPG. Pusla  **Add GPG key**.
+   :::caution
+    Si ya tienes una clave instalada y la eliminas, se invalidara todos los commits
+    firmados con esa clave. Varias claves pueden convivir.
+   :::
 
 
-3. **Configura Git para Usar tu clave GPG al Firmar Commits:**
+3. **Configura Git para usar tu clave GPG al Firmar Commits:**
 
-   - Escribe y ejecuta: 
-     ```
-     git config --global user.signingkey CLAVE_RECIEN_COPIADA
-     ```
-     (Sustituye `CLAVE_RECIEN_COPIADA` con tu **ID** de clave GPG.)
+   Escribe y ejecuta: 
+   ```
+   git config --global user.signingkey CLAVE_RECIEN_COPIADA
+   ```
+   (Sustituye `CLAVE_RECIEN_COPIADA` con tu **ID** de clave GPG.)
 </Steps>
 
 ### Configuración final
 
 - Configura tu nombre y correo electrónico en Git:
-  - Reemplaza `"Nombre_Completo"` y `"MAIL"` con tu nombre y correo electrónico definidos con anterioridad.
-  - Ejecuta los comandos:
+  - Reemplaza `"Nombre_Completo"` y `"MAIL"` con tu nombre y correo electrónico definidos con anterioridad, ejecuta los comandos:
     ```
     git config --global user.name Nombre_Completo
     ```
