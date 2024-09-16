@@ -19,7 +19,7 @@ import { Aside } from '@astrojs/starlight/components';
    Descomprime el archivo .zip que has descargado en una ubicación de tu elección.
    <Aside type="tip">
    Es una buena práctica tener todos los programas que vayan a ser incluidos en el path de Windows dentro de un directorio común exclusivo para este propósito, en mi caso:
-   
+
     ```
     %UserProfile%\Documents\Environments
     ```
@@ -33,6 +33,8 @@ import { Aside } from '@astrojs/starlight/components';
 </Steps>
 
 ### Opción 2: Instalación usando Scoop
+
+<Aside>Scoop es un gestor de paquetes para Windows que simplifica la instalación y gestión de aplicaciones. Instala programas sin necesidad de permisos de administrador y organiza todo en una estructura limpia y portable aislado del resto del sistema, sin archivos residuales. Es ideal para mantener un entorno de trabajo ordenado. https://scoop.sh/</Aside>
 
 <Steps>
 1. **Instala Scoop si no lo tienes:**
@@ -54,10 +56,15 @@ import { Aside } from '@astrojs/starlight/components';
 
 <Steps>
 1. **Descarga GitHub Desktop:**
+
    Visita [https://desktop.github.com](https://desktop.github.com) y descarga la última versión.
+
 2. **Instala GitHub Desktop:**
+
    Ejecuta el instalador y sigue las instrucciones en pantalla.
+
 3. **Agregar Git al PATH del Sistema:**
+
    GitHub Desktop incluye una versión integrada de Git. Para utilizar Git desde la línea de comandos, debes añadir su ruta al PATH *(revisa la opción 1.3)* la ruta suele ser:
     ```
     %UserProfile%\AppData\Local\GitHubDesktop\app-<versión>\resources\app\git\cmd
