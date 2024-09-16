@@ -2,196 +2,57 @@
 title: Conventional Commits
 description: Como configurar la firma de los commits
 ---
-
 import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
+Conventional Commits es una especificación empleada en numerosos proyectos conocidos que establece una serie de reglas para optimizar el historial de commits y permite a las herramientas automatizadas generar un changelog de manera más sencilla.
 
-# Mensajes de Commit Convencionales
+<Aside>Ten en cuenta que estas convenciones solo son relevantes para proyectos donde no se usa "squash and merge" dado que este combina todos los commits de la rama en un único commit en la rama principal.</Aside>
 
-Observa cómo [un cambio menor](#examples) en el estilo de tu mensaje de commit puede marcar la diferencia.
+### Formato
 
-> [!TIP]
-> Echa un vistazo a **[git-conventional-commits](https://github.com/qoomon/git-conventional-commits)**, una utilidad de CLI para asegurar estas convenciones, determinar la versión y generar changelogs.
-
-## Formatos de Mensajes de Commit
-
-### Por Defecto
-<pre>
-<b><a href="#types">&lt;type&gt;</a></b>(<b><a href="#scopes">&lt;optional scope&gt;</a></b>): <b><a href="#description">&lt;description&gt;</a></b>
-<sub>línea de separación vacía</sub>
-<b><a href="#body">&lt;optional body&gt;</a></b>
-<sub>línea de separación vacía</sub>
-<b><a href="#footer">&lt;optional footer&gt;</a></b>
-</pre>
-
-### Merge Commit
-<pre>
-Merge branch '<b>&lt;branch name&gt;</b>'
-</pre>
-<sup>Sigue el mensaje de merge predeterminado de git</sup>
-
-### Revert Commit
-<pre>
-Revert "<b>&lt;reverted commit subject line&gt;</b>"
-</pre>
-<sup>Sigue el mensaje de revert predeterminado de git</sup>
-
-### Commit Inicial 
 ```
-chore: init
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
 ```
 
-### Tipos
-* Cambios relevantes de API
-    * `feat` Commits que añaden o eliminan una nueva funcionalidad
-    * `fix` Commits que corrigen un error
-* `refactor` Commits que reescriben/restructuran tu código, pero no cambian el comportamiento de la API
-    * `perf` Commits que son `refactor` especiales, que mejoran el rendimiento
-* `style` Commits que no afectan el significado (espacios en blanco, formato, falta de puntos y comas, etc.)
-* `test` Commits que añaden pruebas faltantes o corrigen pruebas existentes
-* `docs` Commits que afectan solo la documentación
-* `build` Commits que afectan componentes de construcción como la herramienta de construcción, el pipeline de CI, dependencias, versión del proyecto, ...
-* `ops` Commits que afectan componentes operativos como infraestructura, despliegue, copias de seguridad, recuperación, ...
-* `chore` Commits misceláneos, por ejemplo, modificar `.gitignore`
+**Ejemplo:**
 
-### Scopes
-El `scope` proporciona información contextual adicional.
-* Es una parte **opcional** del formato
-* Los scopes permitidos dependen del proyecto específico
-* No uses identificadores de issues como scopes
+```
+fix(middleware): ensure Range headers adhere more closely to RFC 2616
 
-### Indicador de Cambios de Ruptura
-Los cambios de ruptura deben indicarse con un `!` antes de los `:` en la línea de asunto, por ejemplo, `feat(api)!: remove status endpoint`
-* Es una parte **opcional** del formato
+Add one new dependency, use `range-parser` (Express dependency) to compute
+range. It is more well-tested in the wild.
 
-### Descripción
-La `description` contiene una descripción concisa del cambio.
-* Es una parte **obligatoria** del formato
-* Usa el tiempo presente e imperativo: "change" en lugar de "changed" ni "changes"
-  * Piensa en `Este commit...` o `Este commit debería...`
-* No uses mayúsculas en la primera letra
-* No uses punto (`.`) al final
+Fixes #2310
+```
 
-### Cuerpo
-El `body` debe incluir la motivación del cambio y contrastar esto con el comportamiento anterior.
-* Es una parte **opcional** del formato
-* Usa el tiempo presente e imperativo: "change" en lugar de "changed" ni "changes"
-* Este es el lugar para mencionar identificadores de issues y sus relaciones
+- La primera línea no puede tener más de 70 caracteres.
+- La segunda línea siempre debe estar en blanco.
+- Las demás líneas deben ajustarse a un máximo de 80 caracteres.
+- El tipo y el alcance deben estar siempre en minúsculas.
 
-### Pie de Página
-El `footer` debe contener cualquier información sobre **Cambios de Ruptura** y es también el lugar para **referenciar issues** a los que este commit se refiere.
-* Es una parte **opcional** del formato
-* **Opcionalmente** referencia un issue por su id.
-* **Cambios de Ruptura** deben comenzar con la palabra `BREAKING CHANGES:` seguida de un espacio o dos nuevas líneas. El resto del mensaje de commit se utiliza para esto.
+### Valores Permitidos para `<type>`
 
-### Ejemplos
-* ```
-  feat: add email notifications on new direct messages
-  ```
-* ```
-  feat(shopping cart): add the amazing button
-  ```
-* ```
-  feat!: remove ticket list endpoint
+- `feat` (nueva funcionalidad para el usuario)
+- `fix` (corrección de un error para el usuario)
+- `docs` (cambios en la documentación)
+- `style` (formato, puntos y comas faltantes, etc. sin cambios en el código)
+- `refactor` (refactorización del código, por ejemplo, renombrar una variable)
+- `test` (agregar pruebas faltantes, refactorización de pruebas)
+- `chore` (actualización de tareas de grunt, etc. sin cambios en el código)
 
-  refers to JIRA-1337
-
-  BREAKING CHANGES: ticket endpoints no longer support listing all entities.
-  ```
-* ```
-  fix(api): handle empty message in request body
-  ```
-* ```
-  fix(api): fix wrong calculation of request body checksum
-  ```
-* ```
-  fix: add missing parameter to service call
-
-  The error occurred because of <reasons>.
-  ```
-* ```
-  perf: decrease memory footprint for determine unique visitors by using HyperLogLog
-  ```
-* ```
-  build: update dependencies
-  ```
-* ```
-  build(release): bump version to 1.0.0
-  ```
-* ```
-  refactor: implement fibonacci number calculation as recursion
-  ```
-* ```
-  style: remove empty line
-  ```
-
----
-  
-## Scripts de Git Hook para asegurar el formato del encabezado de mensajes de commit
-<details>
-<summary>Click para expandir</summary>
-   
-### commit-msg Hook (local)
-* Crea un hook de commit-msg utilizando [git-conventional-commits cli](https://github.com/qoomon/git-conventional-commits?tab=readme-ov-file#automatically-validate-commit-message-convention-before-commit)
-
-### pre-receive Hook (lado del servidor)
-* crea el siguiente archivo en tu carpeta de repositorio `.git/hooks/pre-receive`
-  ```shell
-  #!/usr/bin/env bash
-
-  # Hook pre-receive que bloqueará commits con mensajes que no siguen la regla de regex
-
-  commit_msg_type_regex='feat|fix|refactor|style|test|docs|build'
-  commit_msg_scope_regex='.{1,20}'
-  commit_msg_description_regex='.{1,100}'
-  commit_msg_regex="^(${commit_msg_type_regex})(\(${commit_msg_scope_regex}\))?: (${commit_msg_description_regex})\$"
-  merge_msg_regex="^Merge branch '.+'\$"
-
-  zero_commit="0000000000000000000000000000000000000000"
-
-  # No recorrer commits que ya están en el repositorio
-  excludeExisting="--not --all"
-
-  error=""
-  while read oldrev newrev refname; do
-    # branch o tag eliminado
-    if [ "$newrev" = "$zero_commit" ]; then
-      continue
-    fi
-
-    # Verificar nuevo branch o tag
-    if [ "$oldrev" = "$zero_commit" ]; then
-      rev_span=`git rev-list $newrev $excludeExisting`
-    else
-      rev_span=`git rev-list $oldrev..$newrev $excludeExisting`
-    fi
-
-    for commit in $rev_span; do
-      commit_msg_header=$(git show -s --format=%s $commit)
-      if ! [[ "$commit_msg_header" =~ (${commit_msg_regex})|(${merge_msg_regex}) ]]; then
-        echo "$commit" >&2
-        echo "ERROR: Formato de mensaje de commit inválido" >&2
-        echo "$commit_msg_header" >&2
-        error="true"
-      fi
-    done
-  done
-
-  if [ -n "$error" ]; then
-    exit 1
-  fi
-  ```
-* ⚠ Haz ejecutable `.git/hooks/pre-receive` (unix: `chmod +x '.git/hooks/pre-receive'`)
-
-</details>
-
------
 ## Referencias
-* https://www.conventionalcommits.org/
-* https://github.com/angular/angular/blob/master/CONTRIBUTING.md
-* http://karma-runner.github.io/1.0/dev/git-commit-msg.html
 
-
-* https://github.com/github/platform-samples/tree/master/pre-receive-hooks  
-* https://github.community/t5/GitHub-Enterprise-Best-Practices/Using-pre-receive-hooks-in-GitHub-Enterprise/ba-p/13863
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Angular Contribution Guidelines](https://github.com/angular/angular/blob/master/CONTRIBUTING.md)
+- [Documento de Google sobre mensajes de commits](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y)
+- [Guía de Karma Runner](http://karma-runner.github.io/1.0/dev/git-commit-msg.html)
+- [365git Tumblr sobre mensajes de commits](http://365git.tumblr.com/post/3308646748/writing-git-commit-messages)
+- [Nota sobre mensajes de commits en tbaggery](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
+- [Hooks de pre-recepción en GitHub](https://github.com/github/platform-samples/tree/master/pre-receive-hooks)
+- [Mejores prácticas para GitHub Enterprise](https://github.community/t5/GitHub-Enterprise-Best-Practices/Using-pre-receive-hooks-in-GitHub-Enterprise/ba-p/13863)
