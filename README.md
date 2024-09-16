@@ -42,7 +42,7 @@ En `./code` verás las siguientes carpetas y archivos:
 
 Starlight busca archivos .md o .mdx en el directorio `src/content/docs/` cada archivo se expone como una ruta basada en su nombre de archivo. Las imágenes se pueden añadir a `src/assets/` e incrustar en Markdown con un enlace relativo. Los archivos estáticos, como los favicons, se pueden colocar en el directorio `public/`.
 
-Para poder iniciar el proyecto necesitas Node.js instalado en tu sistema y pnpm como gestor de paquetes. Sigue los siguientes pasos
+Para poder iniciar el proyecto necesitas Node.js instalado en tu sistema y pnpm como gestor de paquetes, sigue los siguientes pasos
 
 ```shell
 npm install -g pnpm
