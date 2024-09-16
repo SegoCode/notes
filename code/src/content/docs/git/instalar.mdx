@@ -4,8 +4,9 @@ description: Como configurar la firma de los commits
 ---
 import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-### Opción 1: usando la versión portable de Git
+### Opción 1: Versión portable
 
 <Steps>
 
@@ -15,11 +16,19 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 2. **Extrae el archivo:**
    
-   Descomprime el archivo .zip que has descargado en una ubicación de tu elección, por ejemplo, C:\Herramientas\Git.
+   Descomprime el archivo .zip que has descargado en una ubicación de tu elección.
+   <Aside type="tip">
+   Es una buena práctica tener todos los programas que vayan a ser incluidos en el path de Windows dentro de un directorio común exclusivo para este propósito, en mi caso:
+   
+    ```
+    %UserProfile%\Documents\Environments
+    ```
+
+   </Aside>
 
 3. **Añade Git al PATH del sistema:**
    
-   Haz clic derecho en "**Este PC**" o "**Mi PC**" en el Explorador de Archivos y selecciona Propiedades. Luego, haz clic en **Configuración avanzada del sistema** y después en **Variables de entorno**. Busca la variable Path en "**Variables del sistema**" y haz clic en **Editar**. Añade la ruta donde se encuentra el ejecutable de Git (por ejemplo, C:\Herramientas\Git\cmd) y haz clic en Aceptar para guardar los cambios.
+   Haz clic derecho en "**Este PC**" o "**Mi PC**" en el Explorador de Archivos y selecciona Propiedades. Luego, haz clic en **Configuración avanzada del sistema** y después en **Variables de entorno**. Busca la variable **Path** en "**Variables del sistema**" y haz clic en **Editar**. Añade la ruta donde se encuentra el ejecutable de Git.exe (`.\Git\cmd`) y haz clic en Aceptar para guardar los cambios.
 
 </Steps>
 
@@ -41,7 +50,7 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
    ```
 </Steps>
 
-### Opción 3: usando GitHub Desktop
+### Opción 3: GitHub Desktop
 
 <Steps>
 1. **Descarga GitHub Desktop:**
@@ -51,22 +60,46 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 3. **Agregar Git al PATH del Sistema:**
    GitHub Desktop incluye una versión integrada de Git. Para utilizar Git desde la línea de comandos, debes añadir su ruta al PATH *(revisa la opción 1.3)* la ruta suele ser:
     ```
-    C:\Users\User\AppData\Local\GitHubDesktop\app-<versión>\resources\app\git\cmd
+    %UserProfile%\AppData\Local\GitHubDesktop\app-<versión>\resources\app\git\cmd
     ```
 </Steps>
 
-### Configuración inicial de Git
+<Aside type="tip">
 
-- Aumenta la capacidad de Git para clonar archivos grandes:
-  - En la terminal escribe el comando 
-    ```
-    git config --global core.longpaths true
-    ```
-- Configurar el editor de texto por defecto:
-   - Si prefieres usar Visual Studio Code como editor por defecto 
-     ```
-     git config --global core.editor "code --wait"
-     ```
+Github Desktop genera una carpeta por cada versión y es posible que pierdas el path de git si estás usando su git integrado como global del sistema, por lo tanto, en su carpeta de instalacion renombra **Update.exe** por **Update.exe_back**
+
+```
+%UserProfile%\AppData\Local\GitHubDesktop\
+```
+
+</Aside>
+
+### Configuración inicial
+
+Aumenta la capacidad de Git para clonar archivos grandes, en la terminal escribe el comando:
+```
+git config --global core.longpaths true
+```
+Configurar el editor de texto por defecto:
+```
+git config --global core.editor "code --wait"
+```
+ ```
+git config --global core.editor "idea64.exe"
+```
+Configura la verificación de SSL en caso de que tengas problemas:
+ ```
+git config --global http.sslVerify false
+ ```
+O importa el certificado SSL:
+ ```
+git config --global http.sslCAInfo /path/to/ca.pem
+ ```
+
+También puedes ejecutar configuraciones solo para un repositorio concreto:
+ ```
+git -c http.sslVerify=false clone https://github.com/name/repo
+ ```
 
 <LinkCard
 title="Clientes con soporte oficial"
