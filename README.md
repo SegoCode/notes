@@ -12,7 +12,7 @@
 ## About
 [![Built with Astro](https://astro.badg.es/v2/built-with-astro/tiny.svg)](https://astro.build) [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build) 
 
-Este proyecto tiene como objetivo migrar mis notas en papel y diversos notas acumulados desde que comencé a estudiar ingeniería de software. Incluye guías, utilidades y conocimientos específicos que he recopilado a lo largo del tiempo que considero util.
+Este proyecto tiene como objetivo migrar mis notas en papel y diversas notas acumulados desde que comencé a estudiar ingeniería de software. Incluye guías, utilidades y conocimientos específicos que he recopilado a lo largo del tiempo que considero util.
 
 ## Features
 
