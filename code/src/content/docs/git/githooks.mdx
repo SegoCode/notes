@@ -2,9 +2,9 @@
 title: Git hooks
 description: Como configurar la firma de los commits
 ---
-
 import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
 Un **Git hook** es un script que Git ejecuta automáticamente antes o después de eventos específicos, como hacer un commit, un push o recibir cambios en un repositorio. Los hooks permiten automatizar tareas en el flujo de trabajo de Git, como verificar la calidad del código, realizar pruebas, actualizar dependencias, o, como en nuestro caso, modificar los mensajes de commit para cumplir con una convención establecida.
 
@@ -24,7 +24,7 @@ Los hooks se dividen en dos categorías principales:
    - **post-receive**: Se ejecuta después de que los cambios se han aceptado. Puede utilizarse para implementar servicios de integración continua o notificaciones.
 
 
-### Crear un githook 
+### Crear un githook
 
 Vamos a hacer un githook para estandarizar el mensaje de los commits que añadira una clave de al inicio del mensaje en base a la rama, es decir, si estás en una rama llamada `hotfix/BUG-1234` y haces un commit con el mensaje `Fix null pointer exception`, el mensaje final será:
 
@@ -32,9 +32,7 @@ Vamos a hacer un githook para estandarizar el mensaje de los commits que añadir
   [BUG-1234] Fix null pointer exception
   ```
 
-
 <Steps>
-
 1. **Navega al directorio de hooks de Git:**
 
    Navega al directorio de hooks de tu repositorio local de Git. Este directorio se encuentra en `.git/hooks`
@@ -50,11 +48,65 @@ Vamos a hacer un githook para estandarizar el mensaje de los commits que añadir
 
 3. **Copia el siguiente script en el archivo `commit-msg`:**
 
-   ```
-
+   ```bash
+    #!/bin/sh
+    
+    # Obtener el archivo del mensaje de commit
+    COMMIT_MSG_FILE="$1"
+    
+    # Leer el mensaje de commit
+    COMMIT_MSG="$(cat "$COMMIT_MSG_FILE")"
+    
+    # Verificar si el mensaje de commit ya tiene el formato
+    if echo "$COMMIT_MSG" | grep -qE '^\[[A-Za-z0-9_-]+\]'; then
+        # El mensaje ya tiene el formato deseado, no hacer nada
+        exit 0
+    fi
+    
+    # Obtener el nombre de la rama actual
+    BRANCH_NAME="$(git symbolic-ref --short HEAD 2>/dev/null)"
+    
+    # Verificar si se pudo obtener el nombre de la rama
+    if [ -n "$BRANCH_NAME" ]; then
+        # Verificar si el nombre de la rama contiene una '/'
+        if echo "$BRANCH_NAME" | grep -q '/'; then
+            # Extraer la parte después del último '/'
+            BRANCH_PART="${BRANCH_NAME##*/}"
+            # Extraer los componentes separados por '-'
+            IFS='-' read -r -a PARTS <<< "$BRANCH_PART"
+            # Verificar que haya al menos dos partes
+            if [ "${#PARTS[@]}" -ge 2 ]; then
+                # Construir el TICKET_NUMBER con las dos primeras partes
+                TICKET_NUMBER="${PARTS[0]}-${PARTS[1]}"
+                # Preceder el TICKET_NUMBER al mensaje de commit
+                echo "[$TICKET_NUMBER] $COMMIT_MSG" > "$COMMIT_MSG_FILE"
+            else
+                # Si no hay al menos dos partes, no modificar el mensaje
+                echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
+            fi
+        fi
+    fi
    ```
 
    Guarda los cambios en el archivo.
-
-
 </Steps>
+
+
+<Aside type="tip">
+Se pueden crear plantillas globales para que cualquier directorio git nuevo, se inicialice con tu plantilla:
+
+  <Steps>
+  1. **Crear un directorio de plantilla para Git:**
+  
+      Crea un directorio que servirá como plantilla, por ejemplo `C:\git-template`
+  
+  2. **Añadir el hook a la plantilla:**
+  
+      Dentro de `C:\git-template`, crea una carpeta hooks y copia tu archivo commit-msg dentro.
+
+  3. **Guarda la configuracion de la paltilla:**
+      ```
+       git config --global init.templatedir 'C:/git-template'
+      ```
+  </Steps>
+</Aside>
