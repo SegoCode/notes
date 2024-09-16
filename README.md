@@ -12,20 +12,20 @@
 ## About
 [![Built with Astro](https://astro.badg.es/v2/built-with-astro/tiny.svg)](https://astro.build) [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build) 
 
-Este proyecto tiene como objetivo migrar mis notas en papel y diversos documentos acumulados desde que comencé a estudiar ingeniería de software. Incluye guías, utilidades y conocimientos específicos que he recopilado a lo largo del tiempo que considero util.
+Este proyecto tiene como objetivo migrar mis notas en papel y diversos notas acumulados desde que comencé a estudiar ingeniería de software. Incluye guías, utilidades y conocimientos específicos que he recopilado a lo largo del tiempo que considero util.
 
 ## Features
 
-- SPA con JavaScript mínimo: Construido con Astro.js para lograr una carga rápida.
+- SPA con JavaScript mínimo, construido con Astro.js para lograr una carga rápida.
   
-- Despliegue en GitHub Pages: Hosting gratuito y automatizado para facilitar el acceso y la actualización.
+- Despliegue en GitHub Pages y automatizado para facilitar el acceso y la actualización.
 
-- Integración y Despliegue Continuos (CI/CD): onfigurado con GitHub Actions para automatizar pruebas y despliegues.
+- Integración y Despliegue Continuos (CI/CD) configurado con GitHub Actions para automatizar pruebas y despliegues.
 
 
 ## Quick Start & Information
 
-Dentro del proyecto de Astro + Starlight, verás las siguientes carpetas y archivos:
+En `./code` verás las siguientes carpetas y archivos:
 ```
 .
 ├── public/
@@ -40,13 +40,9 @@ Dentro del proyecto de Astro + Starlight, verás las siguientes carpetas y archi
 └── tsconfig.json
 ```
 
-Starlight busca archivos .md o .mdx en el directorio src/content/docs/. Cada archivo se expone como una ruta basada en su nombre de archivo.
+Starlight busca archivos .md o .mdx en el directorio `src/content/docs/` cada archivo se expone como una ruta basada en su nombre de archivo. Las imágenes se pueden añadir a `src/assets/` e incrustar en Markdown con un enlace relativo. Los archivos estáticos, como los favicons, se pueden colocar en el directorio `public/`.
 
-Las imágenes se pueden añadir a src/assets/ e incrustar en Markdown con un enlace relativo.
-
-Los archivos estáticos, como los favicons, se pueden colocar en el directorio public/.
-
-Requiere Node.js instalado en tu sistema y pnpm como gestor de paquetes. Si no lo tienes, puedes instalarlo ejecutando:
+Para poder iniciar el proyecto necesitas Node.js instalado en tu sistema y pnpm como gestor de paquetes. Sigue los siguientes pasos
 
 ```shell
 npm install -g pnpm
@@ -56,6 +52,7 @@ Clona el repositorio:
 
 ```shell
 git clone https://github.com/SegoCode/notes
+cd code
 ```
 
 Instala las dependencias y compila el proyecto:
@@ -64,34 +61,11 @@ Instala las dependencias y compila el proyecto:
 pnpm install
 ```
 
-Ejecución del Entorno de Desarrollo:
+Ejecución del entorno de desarrollo:
 
 ```shell
 pnpm dev
 ```
-
-### Available Parameters
-
-Example 1
-```shell
-example.exe -help
-```
-*Describes what happens when the help command is executed.*
-
-Example 2
-```shell
-example.exe -done
-```
-*Explains the outcome when the done command is used.*
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
 
 ## Download
 
