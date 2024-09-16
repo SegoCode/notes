@@ -7,8 +7,9 @@ import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 ### Antes de Empezar
 
-- Asegúrate de que GPG esté instalado en tu sistema.
-  - En **Windows**, descarga Gpg4win desde https://gpg4win.org/download.html e instálalo siguiendo las instrucciones del instalador. (Este programa es recomendado directamente de la guía de github)
+Asegúrate de que GPG esté instalado en tu sistema.
+
+En **Windows**, descarga Gpg4win desde https://gpg4win.org/download.html e instálalo siguiendo las instrucciones del instalador. (Este programa es recomendado directamente de la guía de github)
 
 <LinkCard
 title="Signing commits by github"
@@ -39,7 +40,7 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
      Cuando termine, tendrás la clave generada en tu local y podemos continuar.
 </Steps>
 
-### Configuración de Git para usar tu clave GPG
+### Configuración de Git y GitHub
 
 <Steps>
 1. **Lista tus claves GPG y encuentra el ID de tu nueva clave:**
@@ -66,34 +67,39 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
    :::
 
 
-3. **Configura Git para usar tu clave GPG al Firmar Commits:**
+3. **Configura Git para usar tu clave GPG:**
 
    Escribe y ejecuta: 
    ```
    git config --global user.signingkey CLAVE_RECIEN_COPIADA
    ```
    (Sustituye `CLAVE_RECIEN_COPIADA` con tu **ID** de clave GPG.)
-</Steps>
 
-### Configuración final
 
-- Configura tu nombre y correo electrónico en Git:
-  - Reemplaza `"Nombre_Completo"` y `"MAIL"` con tu nombre y correo electrónico definidos con anterioridad, ejecuta los comandos:
+4. **Configura tu nombre y correo electrónico en Git:**
+
+   Reemplaza `"Nombre_Completo"` y `"MAIL"` con tu nombre y correo electrónico definidos con anterioridad, ejecuta los comandos:
     ```
     git config --global user.name Nombre_Completo
     ```
     ```
     git config --global user.email MAIL
-    ```
-- Configura Git para firmar automáticamente tus commits con GPG:
-   - En la misma Terminal, escribe y ejecuta:
-     ```
-     git config --global commit.gpgsign true
-     ```
+    ``` 
+5. **Configura Git para firmar automáticamente tus commits:**
+   
+   Dile a github que quieres firmar todos tus commits, escribe y ejecuta:
+   ```
+   git config --global commit.gpgsign true
+   ```
+</Steps>
 
-### Solución de Problemas
-- Revisa `.gitconfig` en tu directorio home si experimentas problemas.
-- Deberas de eliminar la carpeta .git en antiguos repositorios ya que contendrá antiguas firmas.
+:::caution
+Deberas de eliminar la carpeta .git en tus repositorios ya que contendrá antiguas firmas. Se recomienda clonarlos de nuevo.
+:::
+
+
+### Solución de problemas
+- Revisa `.gitconfig` en tu directorio **home** si experimentas problemas, aquí se declaran las configuraciones de git globales.
 - Si Git no encuentra GPG revisa la variable `gpg.program`, configura la ruta con:  
   ```
   git config --global gpg.program ruta/a/gpg
