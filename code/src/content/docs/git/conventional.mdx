@@ -1,14 +1,24 @@
 ---
-title: Conventional Commits
+title: Convenciones Git
 description: Como configurar la firma de los commits
 ---
 import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
-Conventional Commits es una especificación empleada en numerosos proyectos conocidos que establece una serie de reglas para optimizar el historial de commits y permite a las herramientas automatizadas generar un changelog de manera más sencilla.
+*Conventional Commits* es una especificación empleada en numerosos proyectos conocidos que establece una serie de reglas para optimizar el historial de commits y permite a las herramientas automatizadas generar un changelog de manera más sencilla.
 
-<Aside>Ten en cuenta que estas convenciones solo son relevantes para proyectos donde no se usa "squash and merge" dado que este combina todos los commits de la rama en un único commit en la rama principal.</Aside>
+<Aside>
+Ten en cuenta que estas convenciones solo son relevantes para proyectos donde no se usa "squash and merge" dado que este combina todos los commits de la rama en un único commit en la rama principal, mas informacion en el último apartado.
+</Aside>
+
+
+<CardGrid>
+  <LinkCard title="Trunk based development" href="https://trunkbaseddevelopment.com/" />
+  <LinkCard title="Conventional commits" href="https://www.conventionalcommits.org/en/v1.0.0/" />
+  <LinkCard title="Gitflow" href="https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow" />
+  <LinkCard title="GitLabflow" href="https://docs.gitlab.co.jp/ee/topics/gitlab_flow.html" />
+</CardGrid>
 
 ### Formato
 
@@ -20,7 +30,7 @@ Conventional Commits es una especificación empleada en numerosos proyectos cono
 <footer>
 ```
 
-**Ejemplo:**
+Ejemplo:
 
 ```
 fix(middleware): ensure Range headers adhere more closely to RFC 2616
@@ -36,7 +46,7 @@ Fixes #2310
 - Las demás líneas deben ajustarse a un máximo de 80 caracteres.
 - El tipo y el alcance deben estar siempre en minúsculas.
 
-### Valores Permitidos para `<type>`
+#### Valores Permitidos para `<type>`
 
 - `feat` (nueva funcionalidad para el usuario)
 - `fix` (corrección de un error para el usuario)
@@ -46,13 +56,50 @@ Fixes #2310
 - `test` (agregar pruebas faltantes, refactorización de pruebas)
 - `chore` (actualización de tareas de grunt, etc. sin cambios en el código)
 
-## Referencias
+<Aside>
+El `<scope>` puede estar vacío (por ejemplo, si el cambio es global o difícil de asignar a un único componente), en cuyo caso se omiten los paréntesis.
+</Aside>
 
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [Angular Contribution Guidelines](https://github.com/angular/angular/blob/master/CONTRIBUTING.md)
-- [Documento de Google sobre mensajes de commits](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y)
-- [Guía de Karma Runner](http://karma-runner.github.io/1.0/dev/git-commit-msg.html)
-- [365git Tumblr sobre mensajes de commits](http://365git.tumblr.com/post/3308646748/writing-git-commit-messages)
-- [Nota sobre mensajes de commits en tbaggery](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
-- [Hooks de pre-recepción en GitHub](https://github.com/github/platform-samples/tree/master/pre-receive-hooks)
-- [Mejores prácticas para GitHub Enterprise](https://github.community/t5/GitHub-Enterprise-Best-Practices/Using-pre-receive-hooks-in-GitHub-Enterprise/ba-p/13863)
+### Githook
+
+```bash
+#!/bin/sh
+
+# Leer el mensaje de commit desde el archivo
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Expresión regular para validar el formato de Conventional Commits
+conventional_regex="^(build|chore|ci|docs|feat|fix|perf|refactor|style|test)(\([a-zA-Z0-9_-]+\))?: .{1,50}"
+
+# Validar el mensaje de commit
+if ! echo "$commit_msg" | grep -Eq "$conventional_regex"; then
+  echo "ERROR: El mensaje de commit no sigue el estándar de Conventional Commits."
+  echo "Ejemplo válido: 'feat(login): agregar validación de usuario'"
+  exit 1
+fi
+
+exit 0
+```
+### Squash and merge
+
+Para los proyectos en los que se utiliza la estrategia de "Squash and Merge" al fusionar ramas, seguir el estándar de *Conventional Commits* puede no ser la opción más adecuada, ya que este método combina todos los commits de una rama en uno solo al momento de la fusión. Esto elimina el historial detallado de los cambios realizados, haciendo que la granularidad de los mensajes de commit sea menos relevante. Además, si se sigue el estándar de *Conventional Commits*, que requiere mensajes específicos y detallados para cada commit, muchos de estos mensajes se perderán al consolidarse en un único commit, lo cual puede ser redundante o innecesario.
+
+En estos casos, dado que casi siempre hay una *issue* asociada al desarrollo, se sugiere emplear la siguiente convención para nombrar las ramas:
+
+- `feature/...` para nuevas características o funcionalidades.
+- `bugfix/...` para correcciones de errores.
+
+Además, para ramas cuyo destino es la rama principal (`main`), se recomienda usar:
+
+- `hotfix/...` para correcciones urgentes.
+- `internal/...` para cambios internos o de mantenimiento.
+
+Y para el nombre de las pull requests, se puede seguir la siguiente convención:
+
+- `[BUGFIX-...] Nombre descriptivo` o `[BUGFIX-#...] Nombre descriptivo`, donde `BUGFIX` se reemplaza por el tipo de cambio (`FEATURE`, `HOTFIX`, `INTERNAL`, etc.) y `#...` corresponde al número de la *issue* asociada o un identificador único. Este enfoque proporciona una referencia clara y rápida al tipo de trabajo realizado y su contexto específico, facilitando la revisión y el seguimiento de las pull requests.
+
+
+<Aside>
+Si vas a trabajar con Squash and merge y incidencias asociadas, recuerda revisar https://github.blog/news-insights/product-news/introducing-autolink-references/
+</Aside>
