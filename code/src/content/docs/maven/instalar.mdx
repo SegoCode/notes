@@ -1,0 +1,111 @@
+---
+title: Maven
+description: Cómo configurar Maven Portable y el repositorio de la empresa
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Instalación de Maven Portable en Windows
+
+<Steps>
+
+1. **Verificar la instalación de Java:**
+
+   Abre una ventana de "Símbolo del sistema" y Ejecuta `java -version` para comprobar si Java está instalado y verificar su versión.
+
+2. **Descargar Maven Portable:**
+
+   Visita [la página oficial de Apache Maven](https://maven.apache.org/download.cgi) y descarga la versión binaria ZIP más reciente de Maven.
+
+3. **Extraer los archivos:**
+   Extrae el contenido del archivo ZIP en una carpeta de tu elección, por ejemplo, `C:\Program Files\Maven`.
+
+4. **Configurar la variable de entorno `MAVEN_HOME`:**
+
+   Haz clic derecho en "Este equipo" o "Mi PC" y selecciona **Propiedades**.
+
+   Selecciona **Configuración avanzada del sistema**.
+
+   Haz clic en **Variables de entorno...**.
+
+   En **Variables del sistema**, haz clic en **Nueva...**.
+
+   Crea una variable llamada `MAVEN_HOME` con el valor de la ruta donde extrajiste Maven (por ejemplo, `C:\Program Files\Maven`).
+
+5. **Añadir Maven al `PATH`:**
+
+   En la lista de **Variables del sistema**, selecciona la variable `Path` y haz clic en **Editar...**.
+
+   Haz clic en **Nuevo** y añade `%MAVEN_HOME%\bin`.
+
+   Haz clic en **Aceptar** para guardar los cambios.
+
+6. **Configurar la variable de entorno `JAVA_HOME` (si no está configurada):**
+
+   En **Variables del sistema**, haz clic en **Nueva...**.
+
+   Crea una variable llamada `JAVA_HOME` con el valor de la ruta donde está instalado Java (por ejemplo, `C:\Program Files\Java\jdk-11.0.10`).
+
+7. **Verificar la instalación:**
+
+   Abre una nueva ventana de "Símbolo del sistema" (CMD).
+
+   Ejecuta `mvn -version` para comprobar que Maven está instalado y configurado correctamente.
+
+</Steps>
+
+<Aside>
+Si los comandos no son reconocidos, reinicia el equipo o cierra y abre de nuevo el CMD para que los cambios en las variables de entorno surtan efecto.
+</Aside>
+
+### Configuración inicial
+
+<Steps>
+
+1. **Localizar o crear el archivo `settings.xml`:**
+   Ruta global: `{MAVEN_HOME}\conf\settings.xml`.
+   Ruta de usuario: `C:\Users\{TuUsuario}\.m2\settings.xml`.
+   Se recomienda usar la ruta de usuario para personalizaciones.
+
+2. **Editar el archivo `settings.xml`:**
+   Abre `settings.xml` en un editor de texto.
+   Si no existe, crea uno nuevo con el siguiente contenido básico:
+
+   ```xml
+   <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+   </settings>
+   ```
+
+3. **Configurar el repositorio de la empresa:**
+   
+   Dentro del elemento `<settings>`, añade o modifica el bloque `<mirrors>`:
+   ```xml
+   <mirrors>
+     <mirror>
+       <id>repositorio-empresa</id>
+       <name>Repositorio Maven de la Empresa</name>
+       <url>https://repositorio.empresa.com/repository/maven-releases</url>
+       <mirrorOf>*</mirrorOf>
+     </mirror>
+   </mirrors>
+   ```
+   Esto redirecciona todas las solicitudes de repositorios a tu repositorio corporativo.
+5. **Verificar la configuración:**
+   
+   Ejecuta mvn help:effective-settings para verificar que Maven reconoce los cambios.
+   Construye un proyecto Maven para comprobar que descarga las dependencias desde el repositorio configurado.
+
+</Steps> 
+
+<Aside>
+
+Consejos:
+
+    Seguridad: No compartas tu settings.xml si contiene credenciales sensibles. Considera utilizar settings-security.xml para cifrar contraseñas.
+    Depuración: Si tienes problemas, utiliza el parámetro -X en tus comandos Maven para obtener información detallada.
+
+</Aside> 
