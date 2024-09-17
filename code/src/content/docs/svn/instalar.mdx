@@ -1,0 +1,128 @@
+---
+title: Instalar Subversion
+description: Guía paso a paso para instalar y configurar SVN en Eclipse
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+Si necesitas utilizar Subversion en un entorno Windows, la forma más sencilla y conveniente es emplear TortoiseSVN, una herramienta gráfica que facilita la gestión de repositorios SVN directamente desde el Explorador de Windows.
+
+Otra opción es integrar Subversion con un entorno de desarrollo integrado (IDE) como Eclipse. Mas abajo se detallará cómo configurar y utilizar Subversion dentro de Eclipse para aprovechar todas sus funcionalidades desde un mismo entorno de trabajo.
+
+<LinkCard
+title="TortoiseSVN alternatives"
+description="Alternativas que puedes optar como clientes svn."
+href="https://alternativeto.net/software/tortoisesvn/"/>
+
+## TortoiseSVN
+
+<Steps>
+1. **Descargar TortoiseSVN:**
+
+   Visita la página oficial de TortoiseSVN en [https://tortoisesvn.net/downloads.html](https://tortoisesvn.net/downloads.html).
+   Selecciona la versión adecuada para tu sistema operativo (32 o 64 bits).
+
+2. **Ejecutar el instalador:**
+
+   Una vez descargado, ejecuta el archivo de instalación.
+   Sigue las instrucciones del asistente de instalación para completar el proceso.
+
+3. **Configurar TortoiseSVN:**
+
+   Tras la instalación, haz clic derecho en cualquier carpeta del sistema de archivos.
+   Selecciona `TortoiseSVN > Settings` para abrir la configuración.
+   Configura la URL del repositorio SVN y las credenciales de acceso según sea necesario.
+</Steps>
+
+<Aside>
+TortoiseSVN es una herramienta cliente para SVN que se integra directamente con el Explorador de Windows, lo que facilita la administración de archivos de proyectos de versiones controladas.
+</Aside>
+
+
+## Eclipse
+
+<Steps>
+1. **Abrir el gestor de software:**
+
+   En la barra de menús de Eclipse, ve a `Help > Install New Software`.
+
+2. **Agregar un nuevo repositorio:**
+
+   Haz clic en el botón `Add` para agregar una nueva fuente de software.
+   En la ventana "Add Repository", introduce la siguiente dirección en la caja de texto "Location": `https://dl.bintray.com/subclipse/releases/subclipse/4.2.2/`
+   Haz clic en el botón `OK` para cerrar la ventana.
+
+3. **Seleccionar el plugin de Subclipse:**
+
+   Selecciona el plugin de Subclipse en la lista de software disponible y haz clic en el botón `Next` para continuar.
+
+4. **Completar la instalación:**
+
+   Sigue las instrucciones en pantalla para completar la instalación del plugin.
+</Steps>
+
+### Importar en Eclipse
+
+<Steps>
+1. **Abrir la vista de repositorios SVN:**
+
+   En la barra de menús de Eclipse, ve a `Window > Show View > Other`.
+   En la ventana "Show View", selecciona `SVN > Repositories` y haz clic en `OK`.
+
+2. **Agregar una nueva ubicación de repositorio:**
+
+   En la pestaña "SVN Repositories", haz clic derecho y selecciona `New > Repository Location`.
+   Introduce la URL del proyecto SVN en la caja de texto `URL` y haz clic en `Finish`.
+
+3. **Seleccionar carpetas del proyecto:**
+
+   Selecciona solo las carpetas que son proyectos y marca "Check out as a project in the workspace" (opcional).
+</Steps>
+
+
+<Aside type="tip">
+Cuando importes tu proyecto no olvides en convertirlo en `Maven Project` para poder trabajar con él:
+<Steps>
+
+1. **Convertir proyectos a Maven:**
+
+   Selecciona todos los proyectos, haz clic derecho y selecciona `Configure > Convert to Maven Project`.
+
+2. **Actualizar proyectos Maven:**
+
+   Selecciona todos los proyectos, haz clic derecho y selecciona `Maven > Update Project`.
+</Steps>
+</Aside>
+
+### Manipular un repositorio
+
+<Steps>
+1. **Conectar a un repositorio de SVN:**
+
+   Ve a la pestaña "SVN Repositories" en Eclipse, haz clic derecho y selecciona `New > Repository Location`.
+   Introduce la URL del repositorio SVN y haz clic en `Finish`.
+
+2. **Crear una carpeta en el repositorio de SVN:**
+
+   Haz clic derecho en el repositorio de SVN, selecciona `New > Remote Folder`.
+   Introduce un nombre para la carpeta y haz clic en `Finish`.
+
+3. **Renombrar una carpeta en el repositorio de SVN:**
+
+   Haz clic derecho en la carpeta, selecciona `Rename`.
+   Introduce el nuevo nombre y haz clic en `Finish`.
+
+</Steps>
+### Desconectar y conectar
+
+<Steps>
+1. **Desconectar proyectos del repositorio de SVN:**
+
+   Selecciona los proyectos, haz clic derecho y selecciona `Team > Disconnect`.
+   Marca "Also delete the SVN meta-information from the file system" y haz clic en `OK`.
+
+2. **Compartir proyectos con el repositorio de SVN:**
+
+   Selecciona los proyectos, haz clic derecho y selecciona `Team > Share Project`.
+</Steps>
