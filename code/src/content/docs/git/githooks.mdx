@@ -49,45 +49,44 @@ Vamos a hacer un githook para estandarizar el mensaje de los commits que añadir
 3. **Copia el siguiente script en el archivo `commit-msg`:**
 
    ```bash
-    #!/bin/sh
-    
-    # Obtener el archivo del mensaje de commit
-    COMMIT_MSG_FILE="$1"
-    
-    # Leer el mensaje de commit
-    COMMIT_MSG="$(cat "$COMMIT_MSG_FILE")"
-    
-    # Verificar si el mensaje de commit ya tiene el formato
-    if echo "$COMMIT_MSG" | grep -qE '^\[[A-Za-z0-9_-]+\]'; then
-        # El mensaje ya tiene el formato deseado, no hacer nada
-        exit 0
-    fi
-    
-    # Obtener el nombre de la rama actual
-    BRANCH_NAME="$(git symbolic-ref --short HEAD 2>/dev/null)"
-    
-    # Verificar si se pudo obtener el nombre de la rama
-    if [ -n "$BRANCH_NAME" ]; then
-        # Verificar si el nombre de la rama contiene una '/'
-        if echo "$BRANCH_NAME" | grep -q '/'; then
-            # Extraer la parte después del último '/'
-            BRANCH_PART="${BRANCH_NAME##*/}"
-            # Extraer los componentes separados por '-'
-            IFS='-' read -r -a PARTS <<< "$BRANCH_PART"
-            # Verificar que haya al menos dos partes
-            if [ "${#PARTS[@]}" -ge 2 ]; then
-                # Construir el TICKET_NUMBER con las dos primeras partes
-                TICKET_NUMBER="${PARTS[0]}-${PARTS[1]}"
-                # Preceder el TICKET_NUMBER al mensaje de commit
-                echo "[$TICKET_NUMBER] $COMMIT_MSG" > "$COMMIT_MSG_FILE"
-            else
-                # Si no hay al menos dos partes, no modificar el mensaje
-                echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
-            fi
-        fi
-    fi
+   #!/bin/sh
+   
+   # Obtener el archivo del mensaje de commit
+   COMMIT_MSG_FILE="$1"
+   
+   # Leer el mensaje de commit
+   COMMIT_MSG="$(cat "$COMMIT_MSG_FILE")"
+   
+   # Verificar si el mensaje de commit ya tiene el formato
+   if echo "$COMMIT_MSG" | grep -qE '^\[[A-Za-z0-9_-]+\]'; then
+       # El mensaje ya tiene el formato deseado, no hacer nada
+       exit 0
+   fi
+   
+   # Obtener el nombre de la rama actual
+   BRANCH_NAME="$(git symbolic-ref --short HEAD 2>/dev/null)"
+   
+   # Verificar si se pudo obtener el nombre de la rama
+   if [ -n "$BRANCH_NAME" ]; then
+       # Verificar si el nombre de la rama contiene una '/'
+       if echo "$BRANCH_NAME" | grep -q '/'; then
+           # Extraer la parte después del último '/'
+           BRANCH_PART="${BRANCH_NAME##*/}"
+           # Extraer los componentes separados por '-'
+           IFS='-' read -r -a PARTS <<< "$BRANCH_PART"
+           # Verificar que haya al menos dos partes
+           if [ "${#PARTS[@]}" -ge 2 ]; then
+               # Construir el TICKET_NUMBER con las dos primeras partes
+               TICKET_NUMBER="${PARTS[0]}-${PARTS[1]}"
+               # Preceder el TICKET_NUMBER al mensaje de commit
+               echo "[$TICKET_NUMBER] $COMMIT_MSG" > "$COMMIT_MSG_FILE"
+           else
+               # Si no hay al menos dos partes, no modificar el mensaje
+               echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
+           fi
+       fi
+   fi
    ```
-
    Guarda los cambios en el archivo.
 </Steps>
 
