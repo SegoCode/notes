@@ -1,0 +1,177 @@
+
+---
+title: Convenciones Git
+description: Como configurar la firma de los commits
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# **Guía de Introducción a Maven**
+
+Maven es una herramienta de automatización de construcción de proyectos, especialmente utilizada en proyectos Java. Se basa en el concepto de POM (Project Object Model), que define la estructura del proyecto, sus dependencias y cómo debe construirse.
+
+## **Comandos Básicos de Maven**
+
+### 1. **Obtener la versión del proyecto**
+```bash
+mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec
+```
+
+### 2. **Ejecutar un caso de prueba específico**
+```bash
+mvn -Dtest=<archivo> test
+```
+
+### 3. **Ejecutar un método de prueba específico**
+```bash
+mvn -Dtest=NombreClaseDePrueba#nombreMetodo test
+```
+
+### 4. **Depurar pruebas**
+Pausa las pruebas y espera un depurador remoto en el puerto 5005.
+```bash
+mvn -Dtest=<archivo> -Dmaven.surefire.debug test
+```
+
+## **Referencias de Propiedades**
+
+- **Propiedades del proyecto:**
+  - `project.build.sourceDirectory`
+  - `project.build.scriptSourceDirectory`
+  - `project.build.testSourceDirectory`
+  - `project.build.outputDirectory`
+  - `project.build.testOutputDirectory`
+  - `project.build.directory`
+
+## **Configuración y Solución de Problemas**
+
+### 1. **Eliminar advertencia de codificación de plataforma**
+Para evitar advertencias de codificación, agrega la propiedad `project.build.sourceEncoding` en tu POM:
+```xml
+<project ...>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+</project>
+```
+
+### 2. **Generar el árbol de dependencias**
+Muestra todas las dependencias de un proyecto.
+```bash
+mvn dependency:tree
+```
+
+### 3. **Purgar el repositorio local de Maven**
+Elimina las dependencias locales del repositorio.
+```bash
+mvn dependency:purge-local-repository
+```
+
+## **Configuración de Maven**
+
+### 1. **Sobrescribir el repositorio local**
+```bash
+mvn -Dmaven.repo.local=/ruta/a/tu/repositorio
+```
+
+### 2. **Archivos de configuración personalizados**
+- Configuración de usuario:
+  ```bash
+  mvn -s ~/custom/settings.xml
+  ```
+- Configuración global:
+  ```bash
+  mvn -gs /ruta/a/settings.xml
+  ```
+
+## **Optimización de la Ejecución de Maven**
+
+### 1. **Modo por lotes (batch mode)**
+Ejecuta Maven en modo no interactivo.
+```bash
+mvn -B
+```
+
+### 2. **Construcciones paralelas**
+Ejecuta Maven utilizando un hilo por cada núcleo de CPU disponible.
+```bash
+mvn -T 1C
+```
+
+## **Administración de Perfiles**
+
+### 1. **Desactivar un perfil**
+```bash
+mvn groupId:artifactId:goal -P !perfil-1,!perfil-2
+```
+
+## **Ciclo de Vida de Maven**
+
+Maven tiene tres ciclos de vida principales:
+
+1. **Ciclo de vida de construcción (default):**
+   - Valida, inicializa, genera fuentes, procesa fuentes, compila, procesa clases, ejecuta pruebas, empaqueta, verifica, instala y despliega.
+
+2. **Ciclo de limpieza (clean):**
+   - Pre-limpia, limpia, y post-limpia.
+
+3. **Ciclo de sitio (site):**
+   - Pre-site, genera el sitio, post-site, despliega el sitio.
+
+## **Ejemplos de Uso Común**
+
+### 1. **Forzar actualización desde el repositorio remoto**
+```bash
+mvn -U
+```
+
+### 2. **Generar un proyecto Maven**
+```bash
+mvn -B archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DgroupId=com.ejemplo -DartifactId=proyecto-ejemplo
+```
+
+### 3. **Generar un JAR "sombra" o Uber JAR**
+Utiliza `maven-shade-plugin` para eliminar clases no utilizadas.
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>3.1.0</version>
+      <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>shade</goal>
+          </goals>
+          <configuration>
+            <minimizeJar>true</minimizeJar>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+## **Opciones de Línea de Comando de Maven**
+
+| Opción               | Descripción                                                       |
+|----------------------|-------------------------------------------------------------------|
+| `-B`, `--batch-mode` | Ejecuta Maven en modo no interactivo (batch).                     |
+| `-D`, `--define`     | Define una propiedad del sistema.                                 |
+| `-e`, `--errors`     | Produce mensajes detallados de error de ejecución.                |
+| `-f`, `--file`       | Fuerza el uso de un archivo POM alternativo (o un directorio con `pom.xml`). |
+| `-N`, `--non-recursive` | No recurre a los subproyectos.                               |
+| `-o`, `--offline`    | Trabaja sin conexión a internet.                                  |
+| `-P`, `--activate-profiles` | Activa perfiles específicos, separados por comas.         |
+| `-U`, `--update-snapshots` | Fuerza la actualización de snapshots en los repositorios remotos. |
+| `-X`, `--debug`      | Produce salida detallada de depuración.                           |
+
+## **Conclusión**
+
+Esta guía proporciona una referencia rápida y fácil de entender para desarrolladores que utilizan Maven en sus proyectos. Contiene los comandos y configuraciones más esenciales para manejar de manera eficiente un proyecto basado en Maven.
+
+Si necesitas más detalles o ejemplos específicos, no dudes en pedirlos.
