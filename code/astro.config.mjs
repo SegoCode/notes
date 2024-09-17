@@ -23,7 +23,21 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Subversion',
+					items: [
+						{ slug: 'svn/instalar' },
+					],
+				},
+				{
+					label: 'Maven',
+					badge: { text: '🚧', variant: 'caution' },
+					items: [
+						{ slug: 'maven/instalar' },
+					],
+				},
+				{
 					label: 'Marcadores',
+					badge: { text: '🚧', variant: 'caution' },
 					items: [
 						{ slug: 'marcadores/devtools' },
 						{ slug: 'marcadores/software' },
@@ -31,27 +45,33 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'SVN',
-					autogenerate: { directory: 'guides' },
-				},
-				{
 					label: 'Compilaciones',
+					badge: { text: '🚧', variant: 'caution' },
 					autogenerate: { directory: 'guides' },
 				},
 				{
 					label: 'Despliegues',
+					badge: { text: '🚧', variant: 'caution' },
 					autogenerate: { directory: 'guides' },
 				},
 				{
 					label: 'Certificados',
+					badge: { text: '🚧', variant: 'caution' },
 					autogenerate: { directory: 'guides' },
 				},
 				{
 					label: 'Snippeds',
+					badge: { text: '🚧', variant: 'caution' },
+					autogenerate: { directory: 'guides' },
+				},
+				{
+					label: 'Windows',
+					badge: { text: '🚧', variant: 'caution' },
 					autogenerate: { directory: 'guides' },
 				},
 				{
 					label: 'Guias',
+					badge: { text: '🚧', variant: 'caution' },
 					autogenerate: { directory: 'guides' },
 				},
 			],
