@@ -10,55 +10,66 @@
 </p>
 
 ## About
+[![Built with Astro](https://astro.badg.es/v2/built-with-astro/tiny.svg)](https://astro.build) [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build) 
 
-This section should provide a concise introduction to the application, explaining its primary function and the problem it addresses. 
+Este proyecto tiene como objetivo migrar mis notas en papel y diversas notas acumulados desde que comencé a estudiar ingeniería de software. Incluye guías, utilidades y conocimientos específicos que he recopilado a lo largo del tiempo. Porque anotar es mejor que recordar.
 
 ## Features
 
-- Feature 1: Describe the first key feature of the app. Explain how it benefits the user or improves upon existing solutions.
+- SPA con JavaScript mínimo, construido con Astro.js para lograr una carga rápida.
+  
+- Despliegue en GitHub Pages y automatizado para facilitar el acceso y la actualización.
 
-- Feature 2: Describe the second key feature, focusing on its functionality and any integration capabilities with other tools or platforms.
+- Integración y Despliegue Continuos (CI/CD) configurado con GitHub Actions para automatizar pruebas y despliegues.
 
-- Feature 3: Outline a third feature, detailing its use case and any user-driven components or customization options.
-
-- Add more features as needed...
 
 ## Quick Start & Information
 
-Provide a simple, step-by-step guide on how to set up and start using the application.
-
-> [!NOTE]  
-> Highlights information that users should take into account, even when skimming.
-
-> [!TIP]
-> Optional information to help a user be more successful.
-
-> [!IMPORTANT]  
-> Crucial information necessary for users to succeed.
-
-> [!WARNING]  
-> Critical content demanding immediate user attention due to potential risks.
-
-> [!CAUTION]
-> Negative potential consequences of an action.
-
-### Available Parameters
-
-Example 1
-```shell
-example.exe -help
+En `./code` verás las siguientes carpetas y archivos:
 ```
-*Describes what happens when the help command is executed.*
-
-Example 2
-```shell
-example.exe -done
+.
+├── public/
+├── src/
+│   ├── assets/
+│   ├── content/
+│   │   ├── docs/
+│   │   └── config.ts
+│   └── env.d.ts
+├── astro.config.mjs
+├── package.json
+└── tsconfig.json
 ```
-*Explains the outcome when the done command is used.*
+
+Starlight busca archivos .md o .mdx en el directorio `src/content/docs/` cada archivo se expone como una ruta basada en su nombre de archivo. Las imágenes se pueden añadir a `src/assets/` e incrustar en Markdown con un enlace relativo. Los archivos estáticos, como los favicons, se pueden colocar en el directorio `public/`.
+
+Para poder iniciar el proyecto necesitas Node.js instalado en tu sistema y pnpm como gestor de paquetes, sigue los siguientes pasos
+
+```shell
+npm install -g pnpm
+```
+
+Clona el repositorio:
+
+```shell
+git clone https://github.com/SegoCode/notes
+cd code
+```
+
+Instala las dependencias y compila el proyecto:
+
+```shell
+pnpm install
+```
+
+Ejecución del entorno de desarrollo:
+
+```shell
+pnpm dev
+```
 
 ## Download
 
-Provide a direct link to where users can download the application
+https://github.com/SegoCode/notes/archive/refs/heads/main.zip
 
 ---
 <p align="center"><a href="https://github.com/SegoCode/notes/graphs/contributors">
