@@ -16,11 +16,18 @@ export default defineConfig({
 				{
 					label: 'Git',
 					items: [
-						// Each item here is one entry in the navigation menu.
 						{ slug: 'git/instalar' },
 						{ slug: 'git/firmar' },
 						{ slug: 'git/githooks' },
 						{ slug: 'git/conventional' },
+					],
+				},
+				{
+					label: 'Marcadores',
+					items: [
+						{ slug: 'marcadores/devtools' },
+						{ slug: 'marcadores/software' },
+						{ slug: 'marcadores/blog' },
 					],
 				},
 				{
@@ -41,10 +48,6 @@ export default defineConfig({
 				},
 				{
 					label: 'Snippeds',
-					autogenerate: { directory: 'guides' },
-				},
-				{
-					label: 'Marcadores',
 					autogenerate: { directory: 'guides' },
 				},
 				{
