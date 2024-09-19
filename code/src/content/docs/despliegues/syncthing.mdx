@@ -1,0 +1,123 @@
+---
+title: Syncthing
+description: Crea un sistema de backup seguro y privado utilizando Syncthing y Docker.
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+Esta guía explica cómo crear un sistema de backup de fotos en un servidor Linux (por ejemplo, una Raspberry Pi) utilizando Syncthing y Docker, sin necesidad de configuraciones de red complejas ni apertura de puertos o IP estáticas.
+
+<Steps>
+
+1. **Preparar el entorno**
+
+   Actualiza el sistema para asegurarse de que todos los paquetes están actualizados.
+
+   ```
+   sudo apt-get update && sudo apt-get full-upgrade
+   ```
+
+2. **Instalar Docker**
+
+   Instala Docker ejecutando el siguiente comando:
+
+   ```
+   sudo curl -sSL https://get.docker.com | sh
+    ```
+
+   Agrega el usuario al grupo de Docker para ejecutar comandos sin 'sudo':
+
+    ```
+    sudo usermod -aG docker $USER
+     ```
+
+   <Aside type="note">
+   Es posible se necesite cerrar sesión y volver a iniciarla para que los cambios surtan efecto.
+   </Aside>
+
+3. **Conectar y configurar el almacenamiento externo (Opcional)**
+
+   Si quieres utilizar un dispositivo de almacenamiento externo, sige los pasos.
+
+
+   <Steps>
+     1. **Obtener el UUID del dispositivo de almacenamiento**
+  
+        Ejecuta el siguiente comando para obtener el UUID del dispositivo conectado:
+  
+         ```
+         blkid -t TYPE=vfat -sUUID
+          ```
+  
+        <Aside type="tip">
+        Este comando asume que el sistema de archivos es FAT32 (`TYPE=vfat`). Si utilizas otro sistema de archivos, reemplace `vfat` por el tipo correspondiente, como `ext4` o `ntfs`.
+        </Aside>
+  
+     2. **Crear un punto de montaje**
+  
+        Cree una carpeta donde montará el dispositivo:
+  
+         ```
+         sudo mkdir /mnt/usb1 
+         ```
+  
+     3. **Configurar el montaje automático**
+  
+        Edita el archivo `fstab` para que el dispositivo se monte automáticamente al iniciar el sistema:
+  
+         ```
+         sudo nano /etc/fstab
+         ```
+  
+        Agregua la siguiente línea al final del archivo (reemplaza `TU_UUID` por el UUID de su dispositivo):
+  
+         ```
+         UUID=TU_UUID /mnt/usb1 vfat defaults,auto,users,rw,nofail,noatime,uid=1000,gid=1000 0 0
+        ```
+  
+        <Aside type="note">
+        Los parámetros `uid=1000` y `gid=1000` corresponden al usuario y grupo con permisos para acceder al almacenamiento externo. Generalmente, el usuario por defecto tiene el UID y GID `1000`.
+        </Aside>
+  
+     4. **Reiniciar el Sistema**
+  
+        Reinicia la máquina para aplicar los cambios:
+  
+        ```
+        sudo reboot 
+        ```
+    </Steps>
+
+4. **Desplegar Syncthing con Docker**
+
+   Después de reiniciar, el dispositivo de almacenamiento debería estar montado en `/mnt/usb1`. Ahora, despliegua Syncthing utilizando Docker.
+
+   Ejecuta el siguiente comando:
+
+    ```
+    docker run -d \
+     --name=syncthing \
+     --hostname=syncthing \
+     -e PUID=1000 \
+     -e PGID=1000 \
+     -e TZ=Europe/London \
+     -p 8384:8384 \
+     -p 22000:22000/tcp \
+     -p 22000:22000/udp \
+     -p 21027:21027/udp \
+     -v /docker/appdata/config:/config \
+     -v /mnt/usb1:/data1 \
+     --restart unless-stopped \
+     lscr.io/linuxserver/syncthing:latest
+    ```
+
+   <Aside type="tip">
+   Si has seguido los pasos anteriores, no es necesario modificar este comando. Los parámetros `PUID` y `PGID` deben coincidir con el `UID` y `GID` de su usuario (generalmente `1000`).
+   </Aside>
+
+</Steps>
+
+Una vez ejecutado el comando, Syncthing estará en funcionamiento y su interfaz web estará disponible en el puerto `8384`. Puedes acceder a ella desde un navegador web en la misma red, visitando `http://[IP_DEL_SERVIDOR]:8384`. Para obtener más información sobre cómo utilizar Syncthing, consulte la [documentación oficial](https://docs.syncthing.net/intro/index.html).
+
+Descarga la aplicación móvil de Syncthing desde la [Google Play Store](https://play.google.com/store/apps/details?id=com.github.catfriend1.syncthingandroid&hl=es_419) o la [App Store](https://apps.apple.com/us/app/m%C3%B6bius-sync/id1539203216) la aplicación móvil permite conectarse al servidor mediante un código QR, sin necesidad de configurar IP estáticas ni abrir puertos.
