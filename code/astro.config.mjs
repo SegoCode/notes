@@ -9,6 +9,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Mis notas',
+			customCss: ['./src/style/index.css'],
 			social: {
 				github: 'https://github.com/withastro/starlight',
 			},
