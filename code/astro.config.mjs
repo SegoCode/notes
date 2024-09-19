@@ -21,6 +21,7 @@ export default defineConfig({
 						{ slug: 'git/firmar' },
 						{ slug: 'git/githooks' },
 						{ slug: 'git/conventional' },
+						{ slug: 'git/herramientas' },
 					],
 				},
 				{
@@ -49,8 +50,11 @@ export default defineConfig({
 					badge: { text: '🚧', variant: 'caution' },
 					items: [
 						{ slug: 'marcadores/devtools' },
-						{ slug: 'marcadores/software' },
-						{ slug: 'marcadores/blog' },
+						{ slug: 'marcadores/formacion' },
+						{ slug: 'marcadores/visualizacion' },
+						{ slug: 'marcadores/mocking' },
+						{ slug: 'marcadores/referencias' },
+
 					],
 				},
 				{
