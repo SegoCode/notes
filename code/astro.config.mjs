@@ -11,7 +11,7 @@ export default defineConfig({
 			title: 'Mis notas',
 			customCss: ['./src/style/index.css'],
 			social: {
-				github: 'https://github.com/withastro/starlight',
+				github: 'https://github.com/SegoCode/notes',
 			},
 			sidebar: [
 				{
@@ -37,6 +37,14 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Despliegues',
+					badge: { text: '🚧', variant: 'caution' },
+					items: [
+						{ slug: 'despliegues/syncthing' },
+						{ slug: 'despliegues/portainer' },
+					],
+				},
+				{
 					label: 'Marcadores',
 					badge: { text: '🚧', variant: 'caution' },
 					items: [
@@ -47,11 +55,6 @@ export default defineConfig({
 				},
 				{
 					label: 'Compilaciones',
-					badge: { text: '🚧', variant: 'caution' },
-					autogenerate: { directory: 'guides' },
-				},
-				{
-					label: 'Despliegues',
 					badge: { text: '🚧', variant: 'caution' },
 					autogenerate: { directory: 'guides' },
 				},
