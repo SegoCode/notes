@@ -1,11 +1,80 @@
 ---
 title: Herramientas
-description: Como configurar la firma de los commits
+description: Una selección de herramientas útiles para git.
 ---
 import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
 <CardGrid>
-  <LinkCard href="https://beautifier.io/" title="Beautifier.io" description="Online tool to beautify JavaScript, CSS, and HTML code." />
+  <LinkCard href="https://github.com/jesseduffield/lazygit" title="Lazygit" description="Interfaz de usuario simple para Git en la terminal." />
+  <LinkCard href="https://github.com/marketplace" title="Github marketplace" description="Tienda de actions para Github" />
+  <LinkCard href="https://github.com/apps/desktop" title="GitHub Desktop" description="Aplicación de escritorio que facilita el uso de Git y GitHub." />
+  <LinkCard href="https://www.toptal.com/developers/gitignore" title=".gitignore Generator" description="Generador en línea de archivos .gitignore para diversos entornos." />
+  <LinkCard href="https://github.com/SegoCode/template/tree/main" title="Template SegoCode" description="Plantilla base para proyectos de desarrollo colaborativos." />
+  <LinkCard href="https://tavsec.github.io/github-actions-generator/" title="GitHub Actions Generator" description="Generador visual de flujos de trabajo (workflows) para GitHub Actions." />
+  <LinkCard href="https://shields.io/" title="Shields.io" description="Generador de insignias personalizadas para repositorios de GitHub." />
+  <LinkCard href="https://github.com/Ileriayo/markdown-badges" title="Markdown Badges" description="Colección de insignias para incluir en archivos README en Markdown." />
+  <LinkCard href="https://github.com/sourcegit-scm/sourcegit" title="Sourcegit" description="Alternativa ligera a Git, escrita en Rust." />
+  <LinkCard href="https://github.com/dwyl/repo-badges" title="Repo Badges" description="Insignias para README que reflejan la actividad y calidad del repositorio." />
 </CardGrid>
+
+---
+
+Este script de PowerShell identifica y elimina ramas remotas en Git con más de 4 meses de inactividad, configurado mediante la variable `$monthsOld = 4`. Calcula una fecha umbral restando esos meses a la fecha actual, obtiene todas las ramas remotas y filtra las que son anteriores a esa fecha. Luego, muestra las ramas antiguas y pregunta si se desean eliminar. Si se confirma, elimina tanto la rama remota (`git push --delete origin`) como la rama local (`git branch -d`). Si no hay ramas antiguas, informa al usuario.
+
+```powershell
+# Define el numero de meses antiguos para la comparacion
+$monthsOld = 4
+
+# Obtiene la fecha actual y resta el numero de meses especificado
+$thresholdDate = (Get-Date).AddMonths(-$monthsOld)
+
+# Obtiene todas las ramas remotas con la ultima fecha de commit en formato legible
+$branches = git for-each-ref --sort=-committerdate refs/remotes/ --format="%(refname:short) %(committerdate:iso8601)"
+
+# Convertir la salida de git en objetos de PowerShell para facilitar el manejo
+$branchObjects = $branches | ForEach-Object {
+    $parts = $_ -split ' ', 2
+    [PSCustomObject]@{
+        BranchName = ($parts[0] -replace '^origin/', '')  # Elimina el prefijo 'origin/'
+        LastCommitDate = [DateTime]$parts[1]
+    }
+}
+
+# Filtrar y mostrar las ramas que son mas antiguas que la fecha umbral
+$oldBranches = $branchObjects | Where-Object { $_.LastCommitDate -lt $thresholdDate }
+
+# Imprimir las ramas en un formato tabular
+if ($oldBranches.Count -gt 0) {
+    Write-Output "Ramas remotas mas antiguas que $monthsOld meses:"
+    $format = @{Expression={$_.BranchName};Label="Nombre de la rama";Width=50},
+              @{Expression={$_.LastCommitDate.ToString('yyyy-MM-dd')};Label="Ultimo Commit";Width=20}
+    $oldBranches | Format-Table $format
+
+    # Preguntar si se desea eliminar cada rama
+    $oldBranches | ForEach-Object {
+        $branchName = $_.BranchName
+        $lastCommitDate = $_.LastCommitDate.ToString('yyyy-MM-dd')
+        $response = Read-Host "Desea eliminar la rama '$branchName' con ultimo commit el $lastCommitDate ? (s/n)"
+        if ($response -eq 's') {
+            # Eliminar la rama en remoto
+            Write-Output "Ejecutando comando para eliminar rama remota"
+            git push --delete origin $branchName
+            Write-Output "Rama remota '$branchName' eliminada."
+
+            # Eliminar la rama en local
+            Write-Output "Ejecutando comando para eliminar rama local"
+            git branch -d $branchName
+            Write-Output "Rama local '$branchName' eliminada."
+
+        } else {
+            Write-Output "Rama '$branchName' no eliminada."
+        }
+        Write-Output " "
+        Write-Output " "
+    }
+} else {
+    Write-Output "No hay ramas remotas con mas de $monthsOld meses de antiguedad."
+}
+```
