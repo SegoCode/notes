@@ -1,0 +1,138 @@
+---
+title: docker
+description: Guía paso a paso para empaquetar y desplegar una aplicación Spring Boot en Docker.
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+### Requisitos previos
+
+Antes de comenzar, asegúrate de tener Docker instalado en tu máquina. Si no lo tienes, puedes consultar la [documentación oficial](https://docs.docker.com/get-docker/) para aprender cómo instalar Docker.
+
+<LinkCard
+title="Instalación de Docker"
+description="Guía oficial para instalar Docker."
+href="https://docs.docker.com/get-docker/"/>
+
+### Dockerizando la aplicación Spring Boot
+
+<Steps>
+
+1. **Crear un archivo Dockerfile:**
+
+   En la raíz de tu proyecto Spring Boot, crea un archivo llamado `Dockerfile` con el siguiente contenido:
+
+   ```dockerfile
+   # Para especificar la imagen a usar.
+   FROM openjdk:8-jdk-alpine
+
+   # Para copiar la librería a usar y darle un nombre dentro del contenedor.
+   COPY "./target/SBServicesRest-01.jar" "app.jar"
+
+   # Para especificar el puerto a usar.
+   EXPOSE 8080
+
+   # Para definir los parámetros a usar al ejecutar la aplicación.
+   ENTRYPOINT ["java","-jar","app.jar"]
+   ```
+
+   <Aside type="tip">
+   Asegúrate de que el nombre del archivo JAR que copias (en este caso, `SBServicesRest-01.jar`) coincida con el nombre del archivo generado por tu proyecto.
+   </Aside>
+
+2. **Construir la imagen Docker:**
+
+   Para construir la imagen Docker de tu aplicación Spring Boot, ejecuta el siguiente comando desde la raíz de tu proyecto:
+
+   ```bash
+   docker build -t nombre-de-la-imagen .
+   ```
+
+   Aquí, `nombre-de-la-imagen` es el nombre que le das a tu imagen Docker. Por ejemplo, podrías usar `spring-boot-app`.
+
+   <Aside type="caution">
+   Asegúrate de haber ejecutado `mvn clean package` en tu proyecto para generar el archivo JAR en la carpeta `target/` antes de construir la imagen Docker.
+   </Aside>
+
+3. **Ejecutar el contenedor Docker:**
+
+   Una vez que hayas construido la imagen, puedes ejecutar un contenedor basado en ella usando el siguiente comando:
+
+   ```bash
+   docker run -p 8080:8080 nombre-de-la-imagen
+   ```
+
+   Esto vincula el puerto 8080 en tu máquina local con el puerto 8080 dentro del contenedor.
+
+4. **Crear un contenedor con nombre:**
+
+   Si deseas nombrar el contenedor, puedes usar la opción `--name`:
+
+   ```bash
+   docker run --name MyContainerSB -p 8080:8080 nombre-de-la-imagen
+   ```
+
+   Esto te permitirá referenciar el contenedor fácilmente en comandos futuros.
+
+5. **Verificar que la aplicación está corriendo:**
+
+   Una vez que el contenedor esté en ejecución, puedes acceder a tu aplicación Spring Boot abriendo un navegador y visitando:
+
+   ```
+   http://localhost:8080
+   ```
+
+   Verifica que la aplicación responde correctamente.
+
+</Steps>
+
+### Consideraciones adicionales
+
+<Steps>
+
+1. **Detener el contenedor:**
+
+   Para detener un contenedor que se está ejecutando, puedes usar el siguiente comando:
+
+   ```bash
+   docker stop MyContainerSB
+   ```
+
+   Esto detendrá el contenedor llamado `MyContainerSB`.
+
+2. **Eliminar un contenedor:**
+
+   Si deseas eliminar un contenedor después de haberlo detenido, usa el siguiente comando:
+
+   ```bash
+   docker rm MyContainerSB
+   ```
+
+3. **Problemas comunes:**
+
+   - **El puerto 8080 está en uso:** Si recibes un error de que el puerto 8080 ya está en uso, intenta cambiar el puerto con el siguiente comando:
+
+     ```bash
+     docker run -p 9090:8080 nombre-de-la-imagen
+     ```
+     Esto ejecutará la aplicación en el puerto 9090 en lugar de 8080.
+
+   - **Errores de permisos en Docker:** Si no puedes ejecutar comandos de Docker sin `sudo`, añade tu usuario al grupo de Docker:
+
+     ```bash
+     sudo usermod -aG docker $USER
+     ```
+
+</Steps>
+
+### Recursos útiles
+
+<CardGrid>
+  <LinkCard href="https://spring.io/guides/gs/spring-boot-docker/" title="Guía oficial de Spring Boot en Docker" description="Documentación oficial de Spring para usar Docker." />
+  <LinkCard href="https://docs.docker.com/get-started/" title="Guía de Docker para principiantes" description="Guía oficial de Docker para aprender los conceptos básicos." />
+</CardGrid>
+
+<Aside>
+Si encuentras problemas adicionales, consulta la documentación oficial de Docker o Spring Boot.
+</Aside>
