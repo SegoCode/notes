@@ -38,6 +38,16 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Java',
+					badge: { text: '🚧', variant: 'caution' },
+					items: [
+						{ slug: 'java/sdkman' },
+						{ slug: 'java/docker' },
+						{ slug: 'java/versiones' },
+					],
+				},
+
+				{
 					label: 'Despliegues',
 					badge: { text: '🚧', variant: 'caution' },
 					items: [
