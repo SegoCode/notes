@@ -32,9 +32,9 @@ export default defineConfig({
 				},
 				{
 					label: 'Maven',
-					badge: { text: '🚧', variant: 'caution' },
 					items: [
 						{ slug: 'maven/instalar' },
+						{ slug: 'maven/compile' },
 					],
 				},
 				{
@@ -44,6 +44,10 @@ export default defineConfig({
 						{ slug: 'java/sdkman' },
 						{ slug: 'java/docker' },
 						{ slug: 'java/versiones' },
+						{ slug: 'java/ssl' },
+						{ slug: 'java/jboss' },
+						{ slug: 'java/ifelse' },
+						{ slug: 'java/microservices' },
 					],
 				},
 
@@ -53,6 +57,9 @@ export default defineConfig({
 					items: [
 						{ slug: 'despliegues/syncthing' },
 						{ slug: 'despliegues/portainer' },
+						{ slug: 'despliegues/systemmd' },
+						{ slug: 'despliegues/puppeter' },
+						{ slug: 'despliegues/raspberry' },
 					],
 				},
 				{
@@ -66,31 +73,6 @@ export default defineConfig({
 						{ slug: 'marcadores/referencias' },
 
 					],
-				},
-				{
-					label: 'Compilaciones',
-					badge: { text: '🚧', variant: 'caution' },
-					autogenerate: { directory: 'guides' },
-				},
-				{
-					label: 'Certificados',
-					badge: { text: '🚧', variant: 'caution' },
-					autogenerate: { directory: 'guides' },
-				},
-				{
-					label: 'Snippeds',
-					badge: { text: '🚧', variant: 'caution' },
-					autogenerate: { directory: 'guides' },
-				},
-				{
-					label: 'Windows',
-					badge: { text: '🚧', variant: 'caution' },
-					autogenerate: { directory: 'guides' },
-				},
-				{
-					label: 'Guias',
-					badge: { text: '🚧', variant: 'caution' },
-					autogenerate: { directory: 'guides' },
 				},
 			],
 		}),
