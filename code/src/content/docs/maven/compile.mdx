@@ -1,0 +1,93 @@
+---
+title: Compilaciones
+description: Guía detallada sobre la carpeta target en proyectos Maven y sus archivos generados.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+En cualquier proyecto gestionado por Maven, la carpeta **`target`** es un directorio clave que se genera automáticamente durante el proceso de construcción. Este directorio contiene todos los archivos y artefactos generados, como archivos `.jar`, `.war` o `.ear`, según el tipo de proyecto. La carpeta `target` es esencialmente el resultado final del proceso de compilación y empaquetado, y contiene tanto el empaquetado final del proyecto como archivos temporales utilizados en el proceso de construcción.
+
+- **.war (Web Application Archive):**
+  - Utilizado en proyectos basados en aplicaciones web (servlets, JSP). Contiene el código fuente compilado, dependencias, recursos estáticos (CSS, JS, imágenes), y archivos de configuración. Se despliega en servidores como Tomcat, JBoss, etc.
+
+- **.ear (Enterprise Archive):**
+  - Usado en proyectos Java EE. Contiene múltiples módulos, como `.jar` y `.war`. Se utiliza en aplicaciones empresariales complejas que requieren servidores Java EE como WebSphere, WebLogic o JBoss.
+
+- **.jar (Java Archive):**
+  - Archivo empaquetado que contiene el código compilado en formato `.class` de una aplicación o biblioteca. Puede incluir un `MANIFEST.MF` que especifique detalles como la clase principal si es una aplicación ejecutable.
+  - Se utiliza tanto en bibliotecas Java como en aplicaciones standalone.
+
+- **.fatjar o .uberjar:**
+  - Variante del `.jar` que incluye todas las dependencias necesarias en un solo archivo. Es útil para aplicaciones que se ejecutan sin necesidad de configuraciones adicionales, ya que todas las dependencias externas están dentro del mismo `.jar`.
+  - Muy usado en proyectos que buscan portabilidad y simplicidad en el despliegue.
+
+- **Test Reports:**
+  - Maven genera archivos de reportes de pruebas en `target/surefire-reports` (para pruebas unitarias) o `target/failsafe-reports` (para pruebas de integración).
+  - Estos incluyen archivos `.txt`, `.xml`, o incluso `.html`, con detalles de las pruebas ejecutadas, como los resultados y estadísticas.
+
+- **.class (Archivos de Clase):**
+  - Estos archivos contienen el bytecode de las clases Java compiladas y se almacenan en `target/classes`. Aunque estos no suelen ser empaquetados directamente, representan el código compilado que luego se incluye en archivos `.jar` o `.war`.
+
+- **Generated Sources:**
+  - En muchos proyectos Maven, es común que haya generación de código a partir de plantillas, anotaciones, o fuentes externas. Estos archivos pueden ubicarse en `target/generated-sources` y pueden incluir código Java, XML, o JSON generado por herramientas como JAXB, OpenAPI, etc.
+
+- **Site Directory:**
+  - Si utilizas el plugin `maven-site-plugin`, se genera un sitio web estático en la carpeta `target/site` que contiene documentación sobre el proyecto, como reportes de código fuente, dependencias, métricas de cobertura de código, y más.
+
+- **.log (Archivos de Registro):**
+  - Dependiendo de los plugins que se utilicen en el proyecto Maven, pueden generarse archivos de log en la carpeta `target`, como `build.log`, que contiene el registro completo del proceso de construcción.
+
+- **Dependency Artifacts:**
+  - Cuando Maven empaqueta un artefacto, en la carpeta `target` puede almacenar temporalmente las dependencias descargadas como archivos `.jar` y sus descripciones en formato `.pom`.
+
+Carpetas adicionales:
+- `target/surefire-reports`: Para informes de pruebas unitarias (Surefire).
+- `target/failsafe-reports`: Para informes de pruebas de integración (Failsafe).
+- `target/generated-sources`: Para código fuente generado automáticamente.
+- `target/classes`: Código compilado (archivos .class).
+
+### Comandos
+
+Para evitar errores o inconsistencias, siempre es buena idea limpiar la carpeta `target` antes de una nueva construcción. Esto puede hacerse fácilmente con el siguiente comando Maven:
+
+```bash
+mvn clean
+```
+Este comando eliminará por completo la carpeta `target`, asegurando que la próxima construcción sea limpia y no tenga restos de construcciones anteriores.
+
+- **`mvn package`:** Ejecuta el ciclo de vida de construcción hasta empaquetar el proyecto, creando el archivo `.war` o `.ear`.
+
+- **`mvn install`:** Similar a `package`, pero también instala el artefacto empaquetado en el repositorio local de Maven.
+
+- **`mvn test`:** Ejecuta las pruebas unitarias configuradas para el proyecto. Los resultados de las pruebas se almacenan en `target/surefire-reports`.
+
+- **`mvn verify`:** Ejecuta las pruebas y verifica que el proyecto esté listo para su despliegue. Este comando puede ser útil cuando tienes procesos adicionales que verificar, como validaciones de calidad de código.
+
+#### Parámetros disponibles
+
+| Opción               | Descripción                                                       |
+|----------------------|-------------------------------------------------------------------|
+| `-B`, `--batch-mode` | Ejecuta Maven en modo no interactivo (batch).                     |
+| `-D`, `--define`     | Define una propiedad del sistema.                                 |
+| `-e`, `--errors`     | Produce mensajes detallados de error de ejecución.                |
+| `-f`, `--file`       | Fuerza el uso de un archivo POM alternativo (o un directorio con `pom.xml`). |
+| `-N`, `--non-recursive` | No recurre a los subproyectos.                               |
+| `-o`, `--offline`    | Trabaja sin conexión a internet.                                  |
+| `-P`, `--activate-profiles` | Activa perfiles específicos, separados por comas.         |
+| `-U`, `--update-snapshots` | Fuerza la actualización de snapshots en los repositorios remotos. |
+| `-X`, `--debug`      | Produce salida detallada de depuración.                           |
+
+
+### Despliegue de archivos `.war` y `.ear`
+
+Una vez que Maven ha generado el archivo final, puedes proceder a desplegarlo en un servidor de aplicaciones:
+
+- **Despliegue de un `.war`:**
+  Si estás utilizando Tomcat, por ejemplo, puedes copiar el archivo `.war` a la carpeta `webapps/` de Tomcat y el servidor automáticamente lo desplegará.
+
+  ```bash
+  cp target/myapp.war /path/to/tomcat/webapps/
+  ```
+
+- **Despliegue de un `.ear`:**
+  En servidores de aplicaciones Java EE como JBoss o WebLogic, el archivo `.ear` puede ser desplegado en la carpeta de despliegue o a través de la consola de administración del servidor.
+
