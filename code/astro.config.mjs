@@ -35,31 +35,27 @@ export default defineConfig({
 					items: [
 						{ slug: 'maven/instalar' },
 						{ slug: 'maven/compile' },
+						{ slug: 'maven/errores' },
 					],
 				},
 				{
 					label: 'Java',
-					badge: { text: '🚧', variant: 'caution' },
 					items: [
-						{ slug: 'java/sdkman' },
-						{ slug: 'java/docker' },
-						{ slug: 'java/versiones' },
 						{ slug: 'java/ssl' },
-						{ slug: 'java/jboss' },
 						{ slug: 'java/ifelse' },
 						{ slug: 'java/microservices' },
+						{ slug: 'java/sdkman' },
+						{ slug: 'java/docker' },
+						{ slug: 'java/jboss' },
 					],
 				},
 
 				{
 					label: 'Despliegues',
-					badge: { text: '🚧', variant: 'caution' },
 					items: [
 						{ slug: 'despliegues/syncthing' },
 						{ slug: 'despliegues/portainer' },
-						{ slug: 'despliegues/systemmd' },
 						{ slug: 'despliegues/puppeter' },
-						{ slug: 'despliegues/raspberry' },
 					],
 				},
 				{
@@ -68,10 +64,7 @@ export default defineConfig({
 					items: [
 						{ slug: 'marcadores/devtools' },
 						{ slug: 'marcadores/formacion' },
-						{ slug: 'marcadores/visualizacion' },
 						{ slug: 'marcadores/mocking' },
-						{ slug: 'marcadores/referencias' },
-
 					],
 				},
 			],
