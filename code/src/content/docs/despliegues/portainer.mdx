@@ -6,8 +6,6 @@ import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
-### Antes de Empezar
-
 Asegúrate de tener acceso a internet y permisos de superusuario (sudo). También, deberías tener instalados los paquetes esenciales como `wget` y `curl` para descargar archivos.
 
 <LinkCard
@@ -15,25 +13,9 @@ title="Instalación de Docker"
 description="Guía oficial de Docker para instalación en Linux."
 href="https://docs.docker.com/engine/install/ubuntu/"/>
 
-### Primer Paso
-
 <Steps>
 
-1. **Verificar la conexión a internet:**
-
-   Ejecuta el siguiente comando para verificar si estás en línea:
-
-   ```bash
-   wget -q --spider http://github.com
-   ```
-
-   Si estás en línea, verás el mensaje "Online. Continuing." en la consola. De lo contrario, el script se detendrá y mostrará el mensaje de error "Offline. Go connect to the internet then run the script again."
-
-   <Aside type="tip">
-   Asegúrate de tener una conexión activa antes de continuar.
-   </Aside>
-
-2. **Actualizar los paquetes del sistema:**
+1. **Actualizar los paquetes del sistema:**
 
    Actualiza los paquetes y realiza una actualización completa del sistema:
 
@@ -41,13 +23,9 @@ href="https://docs.docker.com/engine/install/ubuntu/"/>
    sudo apt-get update && sudo apt-get full-upgrade
    ```
 
-   <Steps>
-   1. Confirma si quieres continuar con la actualización si se te solicita.
-   2. Espera a que el proceso termine.
-   3. Si ocurre un error, asegúrate de tener los repositorios correctos configurados.
-   </Steps>
+   Confirma si quieres continuar con la actualización si se te solicita.
 
-3. **Instalar Docker:**
+2. **Instalar Docker:**
 
    Ejecuta el siguiente comando para descargar e instalar Docker:
 
@@ -55,29 +33,25 @@ href="https://docs.docker.com/engine/install/ubuntu/"/>
    curl -sSL https://get.docker.com | sh
    ```
 
-   Si la instalación falla, recibirás el mensaje "Failed to install Docker."
-
-4. **Agregar el usuario al grupo Docker:**
+3. **Agregar el usuario al grupo Docker:**
 
    Una vez Docker esté instalado, añade tu usuario al grupo de Docker para evitar tener que usar `sudo` en cada comando de Docker:
 
    ```bash
    sudo usermod -aG docker $USER
+   sudo su - $USER
    ```
 
    Esto permite que tu usuario tenga los permisos correctos para manejar contenedores Docker.
 
    <Aside type="caution">
    Deberás cerrar la sesión o reiniciar para que los cambios tomen efecto.
+   ```sh
+   sudo service docker restart
+   ```
    </Aside>
 
-</Steps>
-
-### Configuración Adicional
-
-<Steps>
-
-1. **Instalar Portainer:**
+4. **Instalar Portainer:**
 
    Portainer es una interfaz gráfica que facilita la gestión de contenedores Docker. Para instalar Portainer, primero descarga la imagen Docker más reciente:
 
@@ -87,7 +61,7 @@ href="https://docs.docker.com/engine/install/ubuntu/"/>
 
    Si la descarga falla, recibirás el mensaje "Failed to pull latest Portainer docker image!"
 
-2. **Ejecutar Portainer:**
+5. **Ejecutar Portainer:**
 
    Una vez que la imagen de Portainer esté descargada, ejecuta el siguiente comando para iniciar el contenedor:
 
@@ -97,15 +71,7 @@ href="https://docs.docker.com/engine/install/ubuntu/"/>
 
    Esto expondrá Portainer en los puertos 9000 y 9443 de tu sistema.
 
-3. **Reiniciar Docker:**
-
-   Reinicia el servicio Docker para asegurarte de que todo funcione correctamente:
-
-   ```bash
-   sudo service docker restart
-   ```
-
-4. **Reiniciar el sistema:**
+6. **Reiniciar el sistema:**
 
    Finalmente, reinicia el sistema para que los cambios de permisos surtan efecto:
 
@@ -113,28 +79,10 @@ href="https://docs.docker.com/engine/install/ubuntu/"/>
    sudo reboot
    ```
 
-   <Aside type="tip">
-   Si no quieres reiniciar de inmediato, asegúrate de cerrar sesión y volver a iniciar sesión en tu usuario actual.
-   </Aside>
-
 </Steps>
-
-### Solución de problemas
-
-- Si Docker no se instala correctamente, verifica los permisos y asegúrate de que `curl` esté instalado.
-- Si no puedes acceder a Portainer, verifica que los puertos 9000 y 9443 no estén bloqueados por un firewall.
-- Usa el siguiente comando para verificar el estado de Docker:
-
-  ```bash
-  sudo systemctl status docker
-  ```
 
 <CardGrid>
   <LinkCard href="https://docs.docker.com/get-docker/" title="Instalación de Docker" description="Guía oficial para instalar Docker en Linux." />
   <LinkCard href="https://docs.portainer.io/start/install/server/docker/linux" title="Instalación de Portainer" description="Guía oficial para instalar Portainer en Docker." />
-  <LinkCard href="https://github.com/portainer/portainer/issues" title="Problemas comunes en Portainer" description="Consulta o reporta problemas en el repositorio oficial de Portainer." />
 </CardGrid>
 
-<Aside>
-Si encuentras problemas adicionales, consulta la documentación oficial de Docker y Portainer.
-</Aside>
