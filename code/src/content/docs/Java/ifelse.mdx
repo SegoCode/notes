@@ -1,0 +1,203 @@
+---
+title: Patrones if-else
+description: Guía completa para optimizar condicionales if-else en Java utilizando patrones como Enum, Factory, Strategy, y más.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+
+Los escenarios comunes donde encontramos múltiples `if-else` son cuando se realizan cálculos o se toma una decisión en base a diferentes parámetros. Veremos cómo optimizar utilizando patrones como **Enum**, **Factory Pattern**, **Strategy Pattern**, y cómo aprovechar las características modernas de Java como el **Stream API**.
+
+Ejemplo típico de Java con múltiples condicionales `if-else`:
+
+```java
+public class ShippingCostCalculator {
+    public double calculateShippingCost(String shippingType, double weight) {
+        if (shippingType.equals("STANDARD")) {
+            return weight * 5.0;
+        } else if (shippingType.equals("EXPRESS")) {
+            return weight * 10.0;
+        } else if (shippingType.equals("SAME_DAY")) {
+            return weight * 20.0;
+        } else if (shippingType.equals("INTERNATIONAL")) {
+            return weight * 50.0;
+        } else if (shippingType.equals("OVERNIGHT")) {
+            return weight * 30.0;
+        }
+        return 0;
+    }
+}
+```
+
+Este código realiza cálculos de costos de envío basado en el tipo de envío. Si bien funciona, el uso de `if-else` para cada tipo de envío genera código difícil de escalar y mantener.
+
+---
+### Patrón Enum
+
+Un enfoque efectivo para simplificar el código es utilizar **Enum**. Veamos cómo podemos optimizar el código anterior:
+
+```java
+public enum ShippingType {
+    STANDARD {
+        @Override
+        public double getCost(double weight) {
+            return weight * 5.0;
+        }
+    },
+    EXPRESS {
+        @Override
+        public double getCost(double weight) {
+            return weight * 10.0;
+        }
+    },
+    SAME_DAY {
+        @Override
+        public double getCost(double weight) {
+            return weight * 20.0;
+        }
+    },
+    INTERNATIONAL {
+        @Override
+        public double getCost(double weight) {
+            return weight * 50.0;
+        }
+    },
+    OVERNIGHT {
+        @Override
+        public double getCost(double weight) {
+            return weight * 30.0;
+        }
+    };
+
+    public abstract double getCost(double weight);
+}
+
+public class ShippingCostCalculator {
+    public double calculateShippingCost(ShippingType shippingType, double weight) {
+        return shippingType.getCost(weight);
+    }
+}
+```
+---
+### Patrón Factory
+
+Si deseas una mayor flexibilidad y separación lógica, el **Factory Pattern** es una excelente opción. Este patrón te permite crear diferentes estrategias de cálculo dependiendo de los tipos de envío.
+
+**Crear la Interfaz `ShippingCostStrategy`**:
+
+```java
+public interface ShippingCostStrategy {
+    double calculate(double weight);
+}
+```
+
+**Implementar clases específicas para Cada tipo de envío**:
+
+```java
+public class StandardShipping implements ShippingCostStrategy {
+    @Override
+    public double calculate(double weight) {
+        return weight * 5.0;
+    }
+}
+
+public class ExpressShipping implements ShippingCostStrategy {
+    @Override
+    public double calculate(double weight) {
+        return weight * 10.0;
+    }
+}
+
+// Similarmente para SameDayShipping, InternationalShipping y OvernightShipping...
+```
+
+**Crear la Fábrica para Manejar el Enrutamiento**:
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+public class ShippingCostFactory {
+    private static final Map<String, ShippingCostStrategy> strategies = new HashMap<>();
+
+    static {
+        strategies.put("STANDARD", new StandardShipping());
+        strategies.put("EXPRESS", new ExpressShipping());
+        strategies.put("SAME_DAY", new SameDayShipping());
+        strategies.put("INTERNATIONAL", new InternationalShipping());
+        strategies.put("OVERNIGHT", new OvernightShipping());
+    }
+
+    public static ShippingCostStrategy getStrategy(String shippingType) {
+        return strategies.getOrDefault(shippingType, () -> 0.0);
+    }
+}
+```
+---
+
+### Patrón Strategy
+
+El **Strategy Pattern** es similar al Factory, pero su enfoque está en cómo se gestiona la lógica interna de cada cálculo.
+
+**Interfaz Strategy**:
+```java
+public interface ShippingCostStrategy {
+    double calculate(double weight);
+}
+```
+
+**Contexto que Maneja las Estrategias**:
+```java
+public class ShippingCostContext {
+    private ShippingCostStrategy strategy;
+
+    public void setStrategy(ShippingCostStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public double calculateShippingCost(double weight) {
+        return strategy.calculate(weight);
+    }
+}
+```
+
+**Uso del Patrón Strategy**:
+```java
+public class ShippingCostCalculator {
+    private final ShippingCostContext context = new ShippingCostContext();
+
+    public double calculateShippingCost(String shippingType, double weight) {
+        ShippingCostStrategy strategy = ShippingCostFactory.getStrategy(shippingType);
+        context.setStrategy(strategy);
+        return context.calculateShippingCost(weight);
+    }
+}
+```
+---
+
+### Stream API y Map
+
+Si prefieres una solución más compacta y moderna, puedes usar el **Stream API** y **Map** para manejar las condiciones:
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+public class ShippingCostCalculator {
+    private static final Map<String, Double> shippingCosts = new HashMap<>();
+
+    static {
+        shippingCosts.put("STANDARD", 5.0);
+        shippingCosts.put("EXPRESS", 10.0);
+        shippingCosts.put("SAME_DAY", 20.0);
+        shippingCosts.put("INTERNATIONAL", 50.0);
+        shippingCosts.put("OVERNIGHT", 30.0);
+    }
+
+    public double calculateShippingCost(String shippingType, double weight) {
+        return shippingCosts.getOrDefault(shippingType.toUpperCase(), 0.0) * weight;
+    }
+}
+```
+<Aside>
+Para casos más complejos o con muchas reglas, esta solución no es tan flexible como los patrones Factory o Strategy.
+</Aside>
