@@ -1,21 +1,16 @@
 ---
-title: docker
+title: Dockerizar aplicación
 description: Guía paso a paso para empaquetar y desplegar una aplicación Spring Boot en Docker.
 ---
-import { Steps } from '@astrojs/starlight/components';
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
-import { Aside } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
-### Requisitos previos
-
-Antes de comenzar, asegúrate de tener Docker instalado en tu máquina. Si no lo tienes, puedes consultar la [documentación oficial](https://docs.docker.com/get-docker/) para aprender cómo instalar Docker.
+Antes de comenzar, asegúrate de tener Docker instalado en tu máquina. Si no lo tienes, puedes consultar la documentación oficial para aprender cómo instalar Docker.
 
 <LinkCard
 title="Instalación de Docker"
 description="Guía oficial para instalar Docker."
 href="https://docs.docker.com/get-docker/"/>
 
-### Dockerizando la aplicación Spring Boot
 
 <Steps>
 
@@ -37,7 +32,7 @@ href="https://docs.docker.com/get-docker/"/>
    ENTRYPOINT ["java","-jar","app.jar"]
    ```
 
-   <Aside type="tip">
+   <Aside>
    Asegúrate de que el nombre del archivo JAR que copias (en este caso, `SBServicesRest-01.jar`) coincida con el nombre del archivo generado por tu proyecto.
    </Aside>
 
@@ -51,26 +46,46 @@ href="https://docs.docker.com/get-docker/"/>
 
    Aquí, `nombre-de-la-imagen` es el nombre que le das a tu imagen Docker. Por ejemplo, podrías usar `spring-boot-app`.
 
-   <Aside type="caution">
+   <Aside>
    Asegúrate de haber ejecutado `mvn clean package` en tu proyecto para generar el archivo JAR en la carpeta `target/` antes de construir la imagen Docker.
+
+   Aunque también es posible compilar tu proyecto en el momento de la construcción de la imagen Docker. De esta forma, no necesitas compilar el proyecto manualmente antes de construir la imagen. Un ejemplo de `Dockerfile` que hace esto sería:
+
+    ```dockerfile
+    # Imagen base de Maven para compilar el proyecto
+    FROM maven:3.8.5-openjdk-17 AS build
+    WORKDIR /app
+    COPY pom.xml .
+    COPY src ./src
+    RUN mvn clean package -DskipTests
+
+    # Imagen base de Java para ejecutar el JAR
+    FROM openjdk:17
+    WORKDIR /app
+    COPY --from=build /app/target/tu-app.jar tu-app.jar
+    ENTRYPOINT ["java", "-jar", "tu-app.jar"]
+    ```
    </Aside>
+
 
 3. **Ejecutar el contenedor Docker:**
 
    Una vez que hayas construido la imagen, puedes ejecutar un contenedor basado en ella usando el siguiente comando:
 
    ```bash
-   docker run -p 8080:8080 nombre-de-la-imagen
+   docker run -p 9090:8080 nombre-de-la-imagen
    ```
 
-   Esto vincula el puerto 8080 en tu máquina local con el puerto 8080 dentro del contenedor.
+   `8080` es el puerto del contenedor, es decir, el puerto que está escuchando dentro del contenedor.
+
+   `9090` es el puerto de la máquina anfitriona, es el puerto expuesto en la máquina desde la cual accedes al contenedor.
 
 4. **Crear un contenedor con nombre:**
 
    Si deseas nombrar el contenedor, puedes usar la opción `--name`:
 
    ```bash
-   docker run --name MyContainerSB -p 8080:8080 nombre-de-la-imagen
+   docker run --name MyContainerSB -p 9090:8080 nombre-de-la-imagen
    ```
 
    Esto te permitirá referenciar el contenedor fácilmente en comandos futuros.
@@ -87,7 +102,7 @@ href="https://docs.docker.com/get-docker/"/>
 
 </Steps>
 
-### Consideraciones adicionales
+### Eliminar contenedor
 
 <Steps>
 
@@ -109,30 +124,53 @@ href="https://docs.docker.com/get-docker/"/>
    docker rm MyContainerSB
    ```
 
-3. **Problemas comunes:**
+3. **Eliminar la imagen Docker:**
 
-   - **El puerto 8080 está en uso:** Si recibes un error de que el puerto 8080 ya está en uso, intenta cambiar el puerto con el siguiente comando:
+   Para eliminar la imagen Docker después de eliminar los contenedores que la utilizan, puedes ejecutar:
 
-     ```bash
-     docker run -p 9090:8080 nombre-de-la-imagen
-     ```
-     Esto ejecutará la aplicación en el puerto 9090 en lugar de 8080.
+   ```bash
+   docker rmi nombre-de-la-imagen
+   ```
 
-   - **Errores de permisos en Docker:** Si no puedes ejecutar comandos de Docker sin `sudo`, añade tu usuario al grupo de Docker:
+   Reemplaza `nombre-de-la-imagen` con el nombre o ID de la imagen que deseas eliminar.
 
-     ```bash
-     sudo usermod -aG docker $USER
-     ```
+4. **Eliminar volúmenes no utilizados:**
+
+   Los volúmenes Docker almacenan datos persistentes y pueden quedar residuales. Para eliminar volúmenes que ya no están en uso, usa:
+
+   ```bash
+   docker volume prune
+   ```
+
+   Esto eliminará todos los volúmenes que no estén asociados a ningún contenedor en ejecución.
+
+5. **Eliminar redes no utilizadas:**
+
+   Docker también crea redes que pueden quedar residuales. Para limpiar redes no utilizadas, puedes ejecutar:
+
+   ```bash
+   docker network prune
+   ```
+
+   Esto eliminará todas las redes no utilizadas.
+
+6. **Eliminar contenedores detenidos y recursos innecesarios:**
+
+   Si deseas eliminar todos los contenedores detenidos, imágenes que no están en uso, y redes no utilizadas de una sola vez, usa:
+
+   ```bash
+   docker system prune
+   ```
+
+   Esto liberará espacio eliminando todos los recursos innecesarios.
 
 </Steps>
 
-### Recursos útiles
+
+
 
 <CardGrid>
   <LinkCard href="https://spring.io/guides/gs/spring-boot-docker/" title="Guía oficial de Spring Boot en Docker" description="Documentación oficial de Spring para usar Docker." />
   <LinkCard href="https://docs.docker.com/get-started/" title="Guía de Docker para principiantes" description="Guía oficial de Docker para aprender los conceptos básicos." />
 </CardGrid>
 
-<Aside>
-Si encuentras problemas adicionales, consulta la documentación oficial de Docker o Spring Boot.
-</Aside>
