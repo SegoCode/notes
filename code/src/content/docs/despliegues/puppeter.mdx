@@ -1,0 +1,69 @@
+---
+title: Puppeteer en ARM
+description: Guía detallada sobre cómo configurar y ejecutar Puppeteer en sistemas con arquitectura ARM.
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+Puppeteer es una herramienta popular para controlar navegadores de forma automática. Sin embargo, en sistemas con arquitectura ARM, como Raspberry Pi, pueden surgir ciertos problemas que requieren una configuración adicional.
+<LinkCard
+title="Documentación Oficial de Puppeteer"
+description="Enlace a la documentación oficial de Puppeteer."
+href="https://pptr.dev/"/>
+
+#### Configura tu archivo dockerfile:
+
+Para ejecutar Puppeteer en un contenedor Docker, aquí tienes un `Dockerfile` funcional para sistemas ARM:
+
+```dockerfile
+# Usa una imagen base oficial de Node.js versión 20.15.0
+FROM node:20.15.0
+
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Actualiza los paquetes e instala Chromium
+RUN apt-get update && apt-get install -y \
+    chromium
+
+# Establece las variables de entorno para Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV CHROME_BIN /usr/bin/chromium
+
+# Copia el archivo package.json y package-lock.json al directorio de trabajo
+COPY package*.json ./
+
+# Instala las dependencias del proyecto utilizando npm ci
+RUN npm ci
+
+# Copia el resto de los archivos de la aplicación al directorio de trabajo
+COPY . .
+
+# Comando por defecto para ejecutar el script
+CMD ["node", "index.js"]
+```
+
+
+#### **Configura tu archivo `index.js`:**
+
+   Crea un archivo `index.js` en tu proyecto y añade el siguiente código:
+   ```javascript
+   const puppeteer = require('puppeteer');
+
+   const loginAndPerformActions = async () => {
+     const browser = await puppeteer.launch({
+       headless: true,
+       executablePath: process.env.CHROME_BIN,
+       args: ['--no-sandbox', '--disable-setuid-sandbox']
+     });
+
+     const page = await browser.newPage();
+     await page.goto('https://example.com');
+     console.log("Página cargada correctamente");
+     await browser.close();
+   };
+
+   loginAndPerformActions();
+   ```
+Deberías tener un contenedor funcional de puppeteer.
