@@ -1,0 +1,119 @@
+---
+title: Certificados SSL
+description: Guía para la importación automática y manual de certificados SSL en Java.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Para las aplicaciones Java, la verificación de servidores seguros se realiza a través de un almacén de claves que contiene certificados de confianza. 
+
+Utiliza OpenSSL para conectarte al servidor y obtener el certificado:
+
+```bash
+openssl s_client -servername subdomain.domain.es -connect subdomain.domain.es:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >/tmp/certificate.pem
+```
+
+Este comando se conecta al servidor en el puerto 443 y guarda el certificado en un archivo llamado `certificate.pem` dentro del directorio temporal `/tmp`.
+
+Importar el Certificado al Almacén de Claves de Java, una vez obtenido el certificado, utiliza `keytool` para importarlo al almacén de claves de Java:
+
+```bash
+/opt/jdkx.x.x/bin/keytool -import -trustcacerts -file /tmp/certificate.pem -keystore /opt/jdkx.x.x/jre/lib/security/cacerts -alias subdomain.domain.es
+```
+
+Algunos parámetros útiles:
+- `-file` especifica el archivo del certificado a importar.
+- `-keystore` apunta al almacén de claves (cacerts por defecto).
+- `-alias` proporciona un nombre único para identificar el certificado.
+
+Recuerda que la contraseña por defecto para el almacén de claves suele ser `changeit`.
+
+### Automatización de la importación
+
+El siguiente script permite automatizar la importación de certificados SSL en Java:
+
+```bash
+#!/bin/sh
+
+# Establece la variable de entorno JAVA_HOME
+java_executable=$(which java)
+export JAVA_HOME=$(dirname $(dirname $java_executable))
+
+if [ -z "$1" ]; then
+  echo "Error: Se requiere el dominio del servidor como argumento"
+  exit 1
+fi
+
+# Eliminamos antiguos certificados
+if test -e /tmp/certificate.pem; then
+  rm /tmp/certificate.pem
+fi
+
+
+# Obtiene el nombre del servidor del primer parámetro
+server_name=$1
+
+# Asigna el mismo valor a la variable alias
+alias=$server_name
+
+# Obtiene el certificado del servidor y lo guarda en un archivo temporal
+echo "Intentando conectarse al servidor remoto $1"
+openssl s_client -servername "$server_name" -connect "$server_name":443 2>/dev/null </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >/tmp/certificate.pem
+
+# Comprueba si el archivo certificate.pem existe
+if test -e /tmp/certificate.pem; then
+  # Muestra un mensaje si el archivo existe
+  echo "Obtenido con éxito el certificado en /tmp/certificate.pem"
+else
+  # Muestra un mensaje si el archivo no existe
+  echo "Error: No se ha podido obtener el certificado para el dominio $server_name"
+  exit 1
+fi
+
+echo "Instalación de Java actual en $JAVA_HOME"
+
+# Importa el certificado al almacén de claves de Java
+"$JAVA_HOME/bin/keytool" -import -trustcacerts -file /tmp/certificate.pem -keystore "$JAVA_HOME/jre/lib/security/cacerts" -alias "$alias" -storepass changeit -noprompt
+```
+
+Ejemplo de ejecución:
+
+```sh
+./import_ssl_certificate.sh pokeapi.co
+```
+
+<Aside>
+Para dar permisos de ejecución a un script de shell, puedes utilizar el comando chmod. Por ejemplo, si quieres dar permisos de ejecución al script import_ssl_certificate.sh, puedes ejecutar el siguiente comando:
+```sh
+chmod +x import_ssl_certificate.sh
+```
+</Aside>
+
+### Desde el PATH
+
+Para ejecutar el script desde cualquier lugar del sistema, sigue estos pasos:
+
+<Steps>
+
+1. Crea un directorio `bin` en tu carpeta de usuario:
+   ```bash
+   mkdir -p $HOME/bin
+   ```
+
+2. Añade el directorio `bin` a tu variable `PATH`:
+   ```bash
+   echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+   <Aside>
+   Puedes hacerlo editando el archivo de configuración de tu shell (como `~/.bashrc` o `~/.bash_profile` para el shell bash o `~/.zshrc` para el shell zsh):
+   </Aside>
+
+3. Crea un enlace simbólico para el script:
+   ```bash
+   ln -s /ruta/a/import_ssl_certificate.sh $HOME/bin/import_ssl_certificate
+   ```
+
+</Steps>
+De esta forma, podrás ejecutar el script con solo escribir `import_ssl_certificate` en tu terminal, desde cualquier ubicación.
+
+<LinkCard href="https://keystore-explorer.org/index.html" title="keystore explorer" description="Herramienta grafica para gestionar el keystore."/>
