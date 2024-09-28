@@ -1,137 +1,135 @@
 ---
-title: Microservicios
-description: Una guía detallada sobre los conceptos clave, herramientas, y mejores prácticas en la arquitectura de microservicios.
+title: Microservicios checklist
+description: Un checklist detallado con los conceptos clave, herramientas SaaS asociadas y casos de uso en la arquitectura de microservicios.
 ---
 import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
+Los **microservicios** son una arquitectura de software en la que una aplicación se divide en múltiples servicios pequeños e independientes que se comunican entre sí. Cada microservicio tiene una única responsabilidad y puede desarrollarse, desplegarse y escalarse de manera autónoma. Esta lista está diseñada para ayudar a los equipos a implementar una arquitectura de microservicios de forma efectiva, abordando los aspectos clave que deben considerarse.
 
-![microservices](../../../assets/microservices/microservicesRoadmap.png)
-
-
-**Contenerización**
+✅ **Contenerización**
 - Herramientas: [Docker](https://www.docker.com/), [Podman](https://podman.io/), [Buildah](https://buildah.io/)
 - Empaquetar servicios en contenedores para asegurar consistencia.
 - Utilizar imágenes base ligeras (por ejemplo, `openjdk:11-jre-slim`).
 
-**Orquestación de Contenedores**
+✅ **Orquestación de contenedores**
 - Herramientas: [Kubernetes](https://kubernetes.io/), [Docker Swarm](https://docs.docker.com/engine/swarm/), [Apache Mesos](https://mesos.apache.org/), [Nomad](https://www.nomadproject.io/)
 - Automatizar despliegue, escalado y gestión de contenedores.
 - Implementar despliegues continuos (rolling updates).
 
-**Gestión de Configuración**
+✅ **Gestión de configuración**
 - Herramientas: [Spring Cloud Config](https://cloud.spring.io/spring-cloud-config/), [Consul](https://www.consul.io/), [Etcd](https://etcd.io/)
 - Externalizar configuraciones para facilitar cambios sin redeploy.
 - Gestionar versiones y seguridad de configuraciones.
 
-**Comunicación entre Servicios**
+✅ **Comunicación entre servicios**
 - Herramientas: [REST](https://restfulapi.net/), [gRPC](https://grpc.io/), [Kafka](https://kafka.apache.org/), [RabbitMQ](https://www.rabbitmq.com/)
 - Definir contratos claros entre servicios.
 - Considerar la comunicación asíncrona para reducir acoplamiento.
 
-**Descubrimiento de Servicios**
+✅ **Descubrimiento de servicios**
 - Herramientas: [Eureka](https://github.com/Netflix/eureka), [Consul](https://www.consul.io/), [Zookeeper](https://zookeeper.apache.org/)
 - Permitir que los servicios encuentren instancias de otros servicios dinámicamente.
 - Usar DNS basado en etiquetas en Kubernetes.
 
-**Balanceo de Carga y Enrutamiento**
+✅ **Balanceo de carga y enrutamiento**
 - Herramientas: [NGINX](https://www.nginx.com/), [HAProxy](http://www.haproxy.org/), [Traefik](https://traefik.io/)
 - Distribuir tráfico equitativamente entre instancias.
 - Implementar políticas de enrutamiento avanzadas.
 
-**API Gateway**
+✅ **API Gateway**
 - Herramientas: [Kong](https://konghq.com/), [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway), [AWS API Gateway](https://aws.amazon.com/api-gateway/)
 - Centralizar la entrada a los microservicios.
 - Gestionar autenticación, autorización y limitación de tasas.
 
-**Seguridad**
+✅ **Seguridad**
 - Herramientas: [OAuth2](https://oauth.net/2/), [OpenID Connect](https://openid.net/connect/), [Keycloak](https://www.keycloak.org/), [JWT](https://jwt.io/)
 - Implementar autenticación y autorización robusta.
 - Gestionar tokens de acceso de forma segura.
 
-**Resiliencia y Tolerancia a Fallos**
+✅ **Resiliencia y tolerancia a fallos**
 - Herramientas: [Resilience4j](https://resilience4j.readme.io/), [Hystrix](https://github.com/Netflix/Hystrix)
 - Implementar circuit breakers, retries y fallbacks.
 - Gestionar tiempos de espera y políticas de reintento.
 
- **Monitorización y Observabilidad**
+✅ **Monitorización y observabilidad**
  - Herramientas: [Prometheus](https://prometheus.io/), [Grafana](https://grafana.com/), [New Relic](https://newrelic.com/)
  - Recopilar y visualizar métricas de rendimiento.
  - Configurar alertas para eventos críticos.
 
- **Trazabilidad Distribuida**
+✅ **Trazabilidad distribuida**
  - Herramientas: [Jaeger](https://www.jaegertracing.io/), [Zipkin](https://zipkin.io/), [OpenTelemetry](https://opentelemetry.io/)
  - Implementar trazas para seguimiento de solicitudes entre servicios.
  - Correlacionar logs y métricas para diagnóstico efectivo.
 
- **Logging Centralizado**
+✅ **Logging centralizado**
  - Herramientas: [ELK Stack](https://www.elastic.co/what-is/elk-stack), [Graylog](https://www.graylog.org/), [Fluentd](https://www.fluentd.org/)
  - Centralizar logs para facilitar análisis y auditoría.
  - Estandarizar formatos de logging (JSON, etc.).
 
- **Caching**
+✅ **Caching**
  - Herramientas: [Redis](https://redis.io/), [Memcached](https://memcached.org/), [Caffeine](https://github.com/ben-manes/caffeine)
  - Implementar cacheo de datos frecuentes para mejorar rendimiento.
  - Gestionar invalidación y expiración de caché.
 
- **Testing**
+✅ **Testing**
  - Herramientas: [JUnit](https://junit.org/), [Mockito](https://site.mockito.org/), [Testcontainers](https://www.testcontainers.org/), [Pact](https://pact.io/)
  - Escribir pruebas unitarias y de integración.
  - Utilizar pruebas de contrato (Consumer-Driven Contracts).
 
- **Integración y Despliegue Continuos (CI/CD)**
+✅ **Integración y despliegue continuos (CI/CD)**
  - Herramientas: [Jenkins](https://www.jenkins.io/), [GitLab CI/CD](https://docs.gitlab.com/ee/ci/), [CircleCI](https://circleci.com/), [SonarQube](https://www.sonarqube.org/)
  - Automatizar pipelines de build, test y despliegue.
  - Implementar revisiones de código y análisis estático.
 
- **Service Mesh**
+✅ **Service Mesh**
  - Herramientas: [Istio](https://istio.io/), [Linkerd](https://linkerd.io/), [Consul Connect](https://www.consul.io/docs/connect)
  - Gestionar el tráfico entre servicios de forma transparente.
  - Implementar políticas de seguridad y enrutamiento avanzado.
 
- **Serialización y Formatos de Datos**
+✅ **Serialización y formatos de datos**
  - Herramientas: [JSON](https://www.json.org/), [Protocol Buffers](https://developers.google.com/protocol-buffers), [Avro](https://avro.apache.org/)
  - Definir formatos eficientes para comunicación entre servicios.
  - Gestionar compatibilidad de versiones en esquemas de datos.
 
- **Bases de Datos**
+✅ **Bases de datos**
  - Herramientas: [PostgreSQL](https://www.postgresql.org/), [MySQL](https://www.mysql.com/), [MongoDB](https://www.mongodb.com/), [Cassandra](http://cassandra.apache.org/)
  - Cada servicio debe tener su propia base de datos para evitar acoplamiento.
  - Implementar patrones como Saga para gestionar transacciones distribuidas.
 
- **Mensajería y Event Streaming**
+✅ **Mensajería y event Streaming**
  - Herramientas: [Apache Kafka](https://kafka.apache.org/), [RabbitMQ](https://www.rabbitmq.com/), [ActiveMQ](https://activemq.apache.org/)
  - Implementar comunicación asíncrona y basada en eventos.
  - Gestionar patrones como Pub/Sub, Cola de Mensajes, Event Sourcing.
 
- **Documentación de APIs**
+✅ **Documentación de APIs**
  - Herramientas: [Swagger/OpenAPI](https://swagger.io/), [Spring REST Docs](https://spring.io/projects/spring-restdocs)
  - Documentar las APIs de los servicios para facilitar su uso.
  - Mantener la documentación actualizada automáticamente.
 
- **Autenticación y Autorización**
+✅ **Autenticación y autorización**
  - Herramientas: [Spring Security](https://spring.io/projects/spring-security)
  - Implementar mecanismos de seguridad en cada servicio.
  - Gestionar roles y permisos de acceso.
 
- **Gestión de Versiones y Compatibilidad**
+✅ **Gestión de versiones y compatibilidad**
  - Versionar APIs para permitir actualizaciones sin interrumpir servicios.
  - Implementar estrategias de despliegue como Blue-Green o Canary Releases.
 
- **Proveedores de Nube y PaaS**
+✅ **Proveedores de nube y PaaS**
  - Herramientas: [AWS](https://aws.amazon.com/), [Google Cloud Platform](https://cloud.google.com/), [Microsoft Azure](https://azure.microsoft.com/)
  - Utilizar servicios gestionados para bases de datos, mensajería, etc.
  - Implementar prácticas de cloud-native para aprovechar al máximo la nube.
 
- **Funciones Serverless (FaaS)**
+✅ **Funciones Serverless (FaaS)**
  - Herramientas: [AWS Lambda](https://aws.amazon.com/lambda/), [Azure Functions](https://azure.microsoft.com/services/functions/), [Google Cloud Functions](https://cloud.google.com/functions)
  - Procesamiento de eventos en tiempo real.
  - Escenarios con cargas altamente variables.
 
- **Patrones de Diseño**
+✅ **Patrones de diseño**
  - Aplicar patrones como Circuit Breaker, Bulkhead, Retry.
  - Utilizar el patrón de Event Sourcing o CQRS si aplica.
 
- **Operaciones y Mantenimiento**
+✅ **Operaciones y mantenimiento**
  - Herramientas: [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/), [Pulumi](https://www.pulumi.com/)
  - Automatizar la infraestructura como código (IaC).
  - Gestionar actualizaciones y parches de manera programada.
