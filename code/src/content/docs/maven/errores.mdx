@@ -1,0 +1,217 @@
+---
+title: Errores de proyecto
+description: Arreglar errores en un nuevo proyecto
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+
+<Steps>
+
+1. **Limpiar las dependencias actuales de Maven instaladas:**
+
+   Ejecuta el siguiente comando para limpiar las dependencias instaladas en el repositorio local de Maven:
+
+   ```bash
+   mvn dependency:purge-local-repository
+   ```
+
+   Esto asegurará que cualquier dependencia corrupta o desactualizada sea eliminada, obligando a Maven a descargar las versiones correctas.
+
+
+2. **Limpiar todos los archivos generados por el proyecto:**
+
+   Para limpiar todos los archivos y carpetas generados durante construcciones previas, ejecuta:
+
+   ```bash
+   mvn clean
+   ```
+
+   Este comando eliminará la carpeta `target`, asegurando un entorno limpio para la siguiente compilación.
+
+3. **Comprobar dónde está el archivo `settings.xml` que está utilizando Maven:**
+
+   Para identificar el archivo `settings.xml` en uso, ejecuta:
+
+   ```bash
+   mvn help:effective-settings
+   ```
+
+   Esto te mostrará la configuración efectiva, incluyendo la ubicación del archivo `settings.xml`, que puede ser crucial para resolver problemas de proxy, repositorios, y credenciales.
+
+   Si quieres especificar un archivo de configuración personalizado, puedes usar:
+
+   ```bash
+   mvn -s ~/custom/settings.xml clean install
+   ```
+
+   Esto fuerza a Maven a utilizar un archivo `settings.xml` específico.
+
+4. **Validar la estructura del `pom.xml`:**
+
+   Ejecuta el siguiente comando para analizar la estructura del `pom.xml`:
+
+   ```bash
+   mvn validate
+   ```
+
+   Este comando ayudará a identificar problemas de configuración en el `pom.xml`.
+
+5. **Verificar la versión actual del proyecto:**
+
+   Para obtener la versión del proyecto definida en el `pom.xml`:
+
+   ```bash
+   mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec
+   ```
+
+   Este comando es útil para confirmar que estás trabajando con la versión correcta del proyecto.
+
+
+6. **Forzar la actualización de todas las dependencias desde los repositorios remotos:**
+
+   Usa el comando:
+
+   ```bash
+   mvn -U clean install
+   ```
+
+   La opción `-U` obliga a Maven a actualizar todos los snapshots y releases. Esto es útil si sospechas que alguna dependencia local está desactualizada o corrupta.
+
+   <Aside>
+   Si tienes alguna dependencia que no está disponible en el repositorio remoto y necesitas usarla en tu proyecto, puedes copiar el archivo JAR desde el caché de Maven (`~/.m2/repository`) de otro equipo que ya la tenga descargada y luego instalarla manualmente en tu propio repositorio local. Para hacer esto, puedes usar el siguiente comando de Maven:
+
+   ```bash
+   mvn install:install-file \
+      -Dfile=/home/User/Descargas/lib-1.00-SNAPSHOT.jar \
+      -DgroupId=io.user \
+      -DartifactId=lib \
+      -Dversion=1.00-SNAPSHOT \
+      -DgeneratePom=true
+    ```
+   Este comando instala el archivo JAR en tu repositorio local (~/.m2/repository), permitiéndote utilizarlo en tu proyecto sin necesidad de un repositorio remoto. Asegúrate de proporcionar los valores correctos para -Dfile, -DgroupId, -DartifactId y -Dversion de acuerdo con la dependencia que estás instalando. La opción -DgeneratePom=true genera un archivo POM básico automáticamente para esa dependencia.
+   </Aside>
+
+7. **Comprobar que Maven puede descargar las dependencias:**
+
+   Para verificar que Maven puede descargar correctamente las dependencias necesarias, utiliza:
+
+   ```bash
+   mvn dependency:resolve
+   ```
+
+   Además, puedes obtener una representación visual de las dependencias y sus conflictos usando:
+
+   ```bash
+   mvn dependency:tree
+   ```
+
+   Este comando es esencial para identificar dependencias en conflicto y asegurar la coherencia de versiones.
+
+8. **Compilar el proyecto sin ejecutar los tests (JUnit):**
+
+   Si deseas compilar el proyecto sin ejecutar los tests, utiliza:
+
+   ```bash
+   mvn install -DskipTests
+   ```
+
+   Esto compilará el código y empaquetará el proyecto sin pasar por los tests unitarios, lo cual es útil para enfocarse en resolver problemas de compilación.
+
+
+9. **Comprobación final del estado del proyecto:**
+
+   Una vez que hayas realizado los pasos anteriores, intenta compilar el proyecto de nuevo:
+
+   ```bash
+   mvn compile
+   ```
+
+   Si la compilación tiene éxito, procede con:
+
+   ```bash
+   mvn package
+   ```
+
+   Esto debería generar el artefacto final en la carpeta `target`.
+
+   <Aside>
+   Para evitar advertencias de codificación, agrega la propiedad `project.build.sourceEncoding` en tu POM:
+   ```xml
+   <project ...>
+     <properties>
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+   </project>
+   ```
+   </Aside>
+
+</Steps>
+
+### Otros problemas
+
+<Aside type="tip">
+Si tienes problemas recurrentes, considera limpiar el caché local de Maven con el comando `rm -rf ~/.m2/repository`. Esto eliminará todas las dependencias descargadas y puede ayudar a resolver problemas con artefactos corruptos.
+</Aside>
+
+<Aside>
+Si recibes errores relacionados con `UnsupportedClassVersionError`, es probable que estés intentando ejecutar código que ha sido compilado con una versión más reciente de Java de la que está instalada en tu sistema. Asegúrate de que tu entorno de ejecución y de compilación estén alineados.
+Comprueba las versiones del bytecode son correctas con tu version: https://javaalmanac.io/bytecode/versions/
+</Aside>
+
+<Steps>
+
+1. **Verifica los plugins necesarios:**
+
+   Si falta algún plugin o versión, puedes instalarlo ejecutando:
+
+   ```bash
+   mvn plugin:download
+   ```
+
+2. **Comprueba la configuración del `JAVA_HOME`:**
+
+   Asegúrate de que la variable de entorno `JAVA_HOME` está configurada correctamente:
+
+   ```bash
+   echo $JAVA_HOME
+   ```
+
+   Si no está apuntando a la versión correcta, puedes configurarla nuevamente.
+
+3. **Verifica el `settings.xml` para posibles configuraciones erróneas de proxy:**
+
+   Revisa la configuración de proxy en el archivo `settings.xml` si tienes problemas de red, especialmente si trabajas detrás de un firewall corporativo.
+</Steps>
+
+<Aside type="tip">
+Asegúrate de que los repositorios declarados en el `pom.xml` y en el `settings.xml` sean accesibles y estén correctamente configurados. Puedes probar acceso directo a los repositorios utilizando herramientas como `curl` para verificar la conexión.
+</Aside>
+
+<Aside>
+
+Si obtienes un "BUILD SUCCESSFUL" cuando ejecutas Maven desde la consola, pero el mismo proyecto no compila desde el IDE, es posible que alguno de los archivos de configuración del IDE esté corrupto o desactualizado. Esto puede suceder debido a configuraciones de caché, índices corruptos o cambios recientes en el proyecto que el IDE no ha sincronizado correctamente.
+
+**Verificar versiones de Java y Maven en el IDE:**
+Los IDEs pueden utilizar wrappers internos tanto para Maven como para Java. Asegúrate de que el IDE está usando las mismas versiones que tienes configuradas en la consola. Una discrepancia en las versiones puede causar que el proyecto compile correctamente desde la consola pero falle en el IDE.
+
+**Eliminar archivos de configuración del IDE:**
+En algunos casos, eliminar los archivos específicos del IDE (`.idea` para IntelliJ, `.project` y `.classpath` para Eclipse) y luego reimportar el proyecto puede resolver el problema.
+
+**Invalidar caché y reiniciar el IDE:**
+Si usas IntelliJ IDEA, selecciona "File > Invalidate Caches / Restart". Esto elimina las cachés que pueden estar causando problemas y fuerza una reindexación completa del proyecto.
+
+**Eliminar dependencias y volver a sincronizar:**
+Elimina la carpeta `target` y, si es posible, también el caché de dependencias local (`~/.m2/repository`) y luego vuelve a sincronizar el proyecto desde el IDE.
+
+**Importar el proyecto desde cero:**
+A veces, la forma más rápida de resolver problemas complejos de sincronización es eliminar el proyecto del IDE y volver a importarlo desde cero. Esto asegura que todas las configuraciones se regeneren adecuadamente.
+
+**Revisar configuraciones de plugins:**
+Algunos plugins pueden comportarse de manera diferente en el IDE comparado con la consola. Verifica que todos los plugins necesarios estén instalados y correctamente configurados.
+
+</Aside>
+
+<CardGrid>
+  <LinkCard href="https://maven.apache.org/guides/introduction/introduction-to-the-pom.html" title="Introducción al POM" description="Guía para comprender la estructura del POM." />
+  <LinkCard href="https://maven.apache.org/ref/3.6.3/maven-settings/settings.html" title="Configuración del settings.xml" description="Documentación sobre cómo configurar el archivo settings.xml de Maven." />
+</CardGrid>
