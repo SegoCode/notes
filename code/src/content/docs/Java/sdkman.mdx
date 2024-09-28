@@ -1,51 +1,8 @@
 ---
-title: sdkman
+title: Instalar SDKMAN!
 description: Guía paso a paso para cambiar la versión de Java utilizando update-alternatives y SDKMAN!
 ---
-import { Steps } from '@astrojs/starlight/components';
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
-import { Aside } from '@astrojs/starlight/components';
-
-### Cambiar la versión de Java con update-alternatives
-
-<Steps>
-
-1. **Ejecutar el comando update-alternatives:**
-
-   Si tienes varias versiones de Java instaladas en tu sistema, puedes elegir cuál utilizar por defecto con el siguiente comando:
-
-   ```bash
-   sudo update-alternatives --config java
-   ```
-
-   Esto mostrará un menú donde podrás seleccionar la versión de Java que prefieras. 
-
-   <Aside type="tip">
-   Si solo tienes una versión de Java instalada, no verás el menú y el sistema usará esa versión por defecto.
-   </Aside>
-
-2. **Seleccionar la versión de Java:**
-   
-   El menú te pedirá que elijas una de las versiones instaladas. Debes ingresar el número correspondiente a la versión que quieres utilizar.
-
-   <Steps>
-   1. Selecciona el número correspondiente a la versión de Java que deseas usar.
-   2. Presiona Enter para confirmar.
-   </Steps>
-
-   El sistema actualizará la configuración para utilizar la versión seleccionada.
-
-3. **Verificar la versión de Java en uso:**
-   
-   Puedes asegurarte de que el sistema está utilizando la versión correcta ejecutando:
-
-   ```bash
-   java -version
-   ```
-
-</Steps>
-
-### Cambiar la versión de Java con SDKMAN!
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 SDKMAN! es una herramienta que facilita la instalación y gestión de versiones de Java y otros paquetes de software en sistemas UNIX.
 
@@ -68,7 +25,7 @@ SDKMAN! es una herramienta que facilita la instalación y gestión de versiones 
    Esto configurará las variables de entorno necesarias para usar SDKMAN!.
 
 2. **Listar versiones disponibles de Java:**
-   
+
    Para ver todas las versiones de Java disponibles a través de SDKMAN!, ejecuta:
 
    ```bash
@@ -78,7 +35,7 @@ SDKMAN! es una herramienta que facilita la instalación y gestión de versiones 
    Esto mostrará una lista de versiones que puedes instalar.
 
 3. **Instalar una versión específica de Java:**
-   
+
    Para instalar una versión específica de Java (por ejemplo, la versión 8), ejecuta el siguiente comando:
 
    ```bash
@@ -109,26 +66,54 @@ SDKMAN! es una herramienta que facilita la instalación y gestión de versiones 
 
 </Steps>
 
-### Consideraciones adicionales
+**Entorno de ejecución de IDEs:**
 
-- **Entorno de ejecución de IDEs:** 
-  
-  Si estás usando un IDE como IntelliJ o Eclipse, asegúrate de configurar el entorno de ejecución apuntando al directorio donde SDKMAN! almacena la versión de Java en uso: 
+  Si estás usando un IDE como IntelliJ o Eclipse, asegúrate de configurar el entorno de ejecución apuntando al directorio donde SDKMAN! almacena la versión de Java en uso:
 
   ```bash
   /home/tu_usuario/.sdkman/candidates/java/current
   ```
 
-- **Problemas comunes:** 
-  - Si no puedes cambiar la versión de Java, asegúrate de que SDKMAN! esté correctamente instalado y de que hayas ejecutado el comando `source` para inicializarlo.
-  - Verifica que tienes permisos de superusuario (sudo) para cambiar configuraciones globales en el sistema.
+### Cambiar la versión de Java sin SDKMAN!
+<Steps>
+
+1. **Ejecutar el comando update-alternatives:**
+
+   Si tienes varias versiones de Java instaladas en tu sistema, puedes elegir cuál utilizar por defecto con el siguiente comando:
+
+   ```bash
+   sudo update-alternatives --config java
+   ```
+
+   Esto mostrará un menú donde podrás seleccionar la versión de Java que prefieras.
+
+   <Aside>
+   Si solo tienes una versión de Java instalada, no verás el menú y el sistema usará esa versión por defecto.
+   </Aside>
+
+2. **Seleccionar la versión de Java:**
+
+   El menú te pedirá que elijas una de las versiones instaladas. Debes ingresar el número correspondiente a la versión que quieres utilizar.
+
+   <Steps>
+   1. Selecciona el número correspondiente a la versión de Java que deseas usar.
+   2. Presiona Enter para confirmar.
+   </Steps>
+
+   El sistema actualizará la configuración para utilizar la versión seleccionada.
+
+3. **Verificar la versión de Java en uso:**
+
+   Puedes asegurarte de que el sistema está utilizando la versión correcta ejecutando:
+
+   ```bash
+   java -version
+   ```
+
+</Steps>
 
 <CardGrid>
   <LinkCard href="https://sdkman.io/install" title="Instalación de SDKMAN!" description="Guía oficial para instalar SDKMAN!." />
-  <LinkCard href="https://docs.oracle.com/en/java/javase/11/install/overview-jdk-installation.html" title="Instalación de Java" description="Guía oficial para instalar Java." />
-  <LinkCard href="https://docs.sdkman.io/usage.html" title="Uso de SDKMAN!" description="Documentación oficial de SDKMAN! para gestionar versiones de Java." />
+  <LinkCard href="https://sdkman.io/usage" title="Uso de SDKMAN!" description="Documentación oficial de SDKMAN! para gestionar versiones de Java." />
 </CardGrid>
 
-<Aside>
-Si encuentras problemas adicionales o necesitas más ayuda, consulta la documentación oficial de SDKMAN! o de Java.
-</Aside>
