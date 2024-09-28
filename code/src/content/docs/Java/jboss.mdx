@@ -1,0 +1,135 @@
+---
+title: Configuraciones Jboss
+description: Guía para la ejecución y configuración de aplicaciones JBoss en modo standalone sin utilizar Systemd.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+El servidor de aplicaciones JBoss (también conocido como WildFly) ofrece varias formas de ejecución, una de ellas es el modo **standalone**. En este modo, el servidor se ejecuta de forma independiente sin conectarse a otros servidores, lo que lo hace adecuado para entornos de desarrollo o despliegues simples.
+
+Uno de los comandos más utilizados para iniciar JBoss en modo standalone es:
+
+```bash
+cd /opt/jboss/wildfly/bin
+./standalone.sh -b=0.0.0.0 -Djmax.socket.binding.port-offset=710
+```
+
+Este comando hace lo siguiente:
+
+**-b=0.0.0.0**: Le indica a JBoss que escuche en todas las direcciones IP disponibles en la máquina. La opción `-b=0.0.0.0` permite que JBoss escuche en todas las interfaces de red de la máquina. Esto es útil si deseas que el servidor sea accesible desde otras máquinas. Si solo quieres que JBoss escuche en una interfaz específica (por ejemplo, en `127.0.0.1` para acceso local).
+
+**-Djmax.socket.binding.port-offset=710**: Aplica un "offset" de 710 a los puertos predeterminados en los que JBoss escucha. Por ejemplo, si el puerto predeterminado es 8080, entonces JBoss usará el puerto 8890 (8080 + 710). Además, ten en cuenta los servicios que JBoss puede estar exponiendo, como el puerto HTTP (por defecto 8080) y el puerto de administración (por defecto 9990). Con el offset de 710, estos puertos se desplazarán a 8890 y 10700 respectivamente.
+
+<Aside>
+Asegúrate de colocar tus aplicaciones en la carpeta de despliegue (`/deployments/`) de JBoss. Puedes colocar tus archivos `.war` o `.ear` en la carpeta correspondiente para que sean desplegados automáticamente al iniciar el servidor.
+</Aside>
+
+**Despliegue de Múltiples Aplicaciones**:
+Si planeas desplegar varias aplicaciones en la misma instancia de JBoss, asegúrate de que todas estén correctamente configuradas en la carpeta de despliegue, y no olvides ajustar los recursos necesarios en el archivo `standalone.xml`.
+
+**Acceso a Logs**:
+Para verificar los logs y posibles errores durante la ejecución, puedes consultar el archivo de logs ubicado en:
+
+```bash
+$JBOSS_HOME/standalone/log/server.log
+```
+
+**Configuración de Usuarios de Administración**:
+Si necesitas configurar un usuario administrador, puedes ejecutar el siguiente comando:
+
+```bash
+$JBOSS_HOME/bin/add-user.sh
+```
+
+### Configuraciones de Proxy
+
+Para implementar la solución en un servidor JBoss, hay que agregar las siguientes líneas de código en el archivo de inicio de JBoss (por ejemplo, standalone.conf o domain.conf):
+```
+JAVA_OPTS="$JAVA_OPTS -Dhttp.proxyHost=proxy.int.local -Dhttp.proxyPort=3128 -Dhttps.proxyHost=proxy.int.local -Dhttps.proxyPort=3128"
+JAVA_OPTS="$JAVA_OPTS -Dhttp.nonProxyHosts=*.us.es|localhost"
+```
+
+Estos cambios en el archivo de inicio informan a JBoss sobre el servidor proxy que se está utilizando y su puerto, y también especifican qué hosts no deben ser contactados a través del proxy. La implementación de esta solución requiere acceso a los archivos de configuración de JBoss y la capacidad de modificar el archivo de inicio.
+
+### Jboss con servicios
+
+Los siguientes pasos indican cómo detener un servidor JBoss en un sistema Linux:
+
+1. `ssh jboss@192.168.1.1`: este comando se utiliza para conectarse a un sistema Linux remoto con la dirección IP "192.168.1.1" utilizando el protocolo SSH. El usuario que se está conectando es "jboss" y se debe proporcionar la clave de acceso para autenticarse.
+
+2. `/etc/init.d/jboss stop`: una vez conectado al sistema remoto, este comando se utiliza para detener el servidor JBoss que se está ejecutando en el sistema. El archivo de inicio del servidor JBoss se encuentra en la ruta `/etc/init.d/jboss` y el comando `stop` se utiliza para detener el servidor.
+
+Estos pasos se utilizan para detener un servidor JBoss en un sistema Linux remoto utilizando el protocolo SSH. Primero se conecta al sistema remoto y luego se ejecuta el comando de detención del servidor JBoss.
+
+#### ¿No tenemos /init.d/ scripts?
+En sistemas operativos basados en `systemd`, el comando `/etc/init.d/jboss stop` no se utiliza para detener el servidor JBoss ya que `systemd` es un sistema de gestión de procesos y servicios más avanzado que el sistema de inicio tradicional `init.d`. En lugar de utilizar el comando `/etc/init.d/jboss stop`, se puede utilizar el comando `systemctl` para detener el servidor JBoss en sistemas operativos basados en `systemd`.
+
+Por ejemplo, para detener el servidor JBoss en un sistema operativo basado en `systemd`, se puede ejecutar el siguiente comando:
+
+```
+sudo systemctl stop jboss
+```
+
+Para iniciar el servidor JBoss en un sistema operativo basado en `systemd`, se puede ejecutar el siguiente comando:
+
+
+```
+sudo systemctl start jboss
+```
+
+#### Configuraciones para Systemd
+
+Systemd es un sistema de gestión de procesos y servicios en Ubuntu y otros sistemas operativos basados en Linux. Se encarga de iniciar y detener servicios y procesos en el sistema, y también puede administrar el arranque del sistema.
+
+Para crear un servicio Tomcat en Ubuntu:
+
+1. Crea un archivo de configuración para el servicio Tomcat en el directorio `/etc/systemd/system/`. El nombre del archivo debe ser `tomcat.service`.
+
+2. Abre el archivo tomcat.service y agrega el siguiente contenido:
+
+```
+[Unit]
+Description=Tomcat 7 Service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+User=tomcat7
+Group=aplicaciones
+
+Environment="JAVA_HOME=/opt/User/aplicaciones/jdk1.7"
+
+ExecStart=/opt/User/aplicaciones/tomcat7/bin/startup.sh
+ExecStop=/opt/User/aplicaciones/tomcat7/bin/shutdown.sh
+
+[Install]
+WantedBy=multi-user.target
+```
+
+_O para wildfly..._
+
+```
+[Unit]
+Description=WildFly application server
+After=network.target
+
+[Service]
+Type=simple
+User=wildfly
+Group=aplicaciones
+StandardOutput=null
+StandardError=null
+Environment=JAVA_HOME=/opt/User/aplicaciones/jdk1.8
+ExecStart=/opt/User/aplicaciones/wildfly/bin/standalone.sh -b=0.0.0.0
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Y con el comando `systemctl status tomcat7` lo utilizamos para obtener información sobre el estado de un servicio llamado `tomcat7` en un sistema operativo basado en `systemd`. Este comando muestra información sobre el estado actual del servicio, incluyendo si está en ejecución o detenido, y también muestra información sobre el proceso que se está ejecutando para el servicio.
+
+<Aside>
+En un sistema que utiliza Systemd, el sufijo `.service` en un nombre de servicio se utiliza para identificar que es un archivo de unidad Systemd. Los archivos de unidad Systemd describen cómo un servicio es gestionado por Systemd, incluyendo su comportamiento al inicio, detener y reiniciar.
+
+Por lo tanto, un servicio llamado `tomcat7` y `tomcat7.service` serían el mismo servicio, pero el segundo nombre identifica explícitamente que es un archivo de unidad Systemd. La nomenclatura `.service` permite a Systemd identificar fácilmente el archivo de unidad correspondiente al servicio y, por lo tanto, realizar acciones como iniciar, detener y reiniciar el servicio de forma más fácil y precisa.
+</Aside>
