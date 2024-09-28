@@ -6,7 +6,7 @@ import { Steps } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
-Esta guía explica cómo crear un sistema de backup de fotos en un servidor Linux (por ejemplo, una Raspberry Pi) utilizando Syncthing y Docker, sin necesidad de configuraciones de red complejas ni apertura de puertos o IP estáticas.
+Cómo crear un sistema de backup de fotos en un servidor Linux (por ejemplo, una Raspberry Pi) utilizando Syncthing y Docker, sin necesidad de configuraciones de red complejas ni apertura de puertos o IP estáticas.
 
 <Steps>
 
@@ -44,7 +44,7 @@ Esta guía explica cómo crear un sistema de backup de fotos en un servidor Linu
    <Steps>
      1. **Obtener el UUID del dispositivo de almacenamiento**
   
-        Ejecuta el siguiente comando para obtener el UUID del dispositivo conectado:
+        Ejecuta el siguiente comando para obtener el UUID `(/dev/sda1: UUID="xxx-xxx")` del dispositivo conectado:
   
          ```
          blkid -t TYPE=vfat -sUUID
@@ -101,7 +101,7 @@ Esta guía explica cómo crear un sistema de backup de fotos en un servidor Linu
      --hostname=syncthing \
      -e PUID=1000 \
      -e PGID=1000 \
-     -e TZ=Europe/London \
+     -e TZ=Europe/Madrid \
      -p 8384:8384 \
      -p 22000:22000/tcp \
      -p 22000:22000/udp \
