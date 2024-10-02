@@ -16,9 +16,7 @@ Este proyecto tiene como objetivo migrar mis notas en papel y diversas notas acu
 
 ## Features
 
-- SPA con JavaScript mínimo, construido con Astro.js para lograr una carga rápida.
-  
-- Despliegue en GitHub Pages y automatizado para facilitar el acceso y la actualización.
+- Estatica con JavaScript mínimo, construido con Astro.js para lograr una carga rápida.
 
 - Integración y Despliegue Continuos (CI/CD) configurado con GitHub Actions para automatizar pruebas y despliegues.
 
