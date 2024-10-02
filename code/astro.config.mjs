@@ -46,6 +46,7 @@ export default defineConfig({
 						{ slug: 'java/microservices' },
 						{ slug: 'java/sdkman' },
 						{ slug: 'java/docker' },
+						{ slug: 'java/dockersize' },
 						{ slug: 'java/jboss' },
 					],
 				},

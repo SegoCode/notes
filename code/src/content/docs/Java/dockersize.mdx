@@ -1,0 +1,90 @@
+---
+title: Optimizar Dockerización
+description: Guía paso a paso para empaquetar y desplegar una aplicación Spring Boot en Docker.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+**Imágenes más pequeñas** significan menos datos para transferir. Esto se traduce en descargas más rápidas desde los registros, implementaciones más ágiles y menor tiempo para escalar tus aplicaciones. Las imágenes más pequeñas a menudo conducen a tiempos de inicio de contenedor más rápidos.
+
+### Usa Imágenes Base Mínimas
+
+Una de las formas más efectivas de reducir el tamaño de tu imagen Docker es comenzar con una imagen base mínima. La imagen base es la base de tu imagen Docker, y elegir la adecuada puede marcar una diferencia significativa.
+
+En lugar de usar una imagen de sistema operativo completa como:
+
+```dockerfile
+FROM ubuntu
+```
+
+Considera usar una alternativa más liviana:
+
+```dockerfile
+FROM alpine
+```
+
+Alpine Linux es una distribución de Linux orientada a la seguridad y ligera, de solo 5 MB de tamaño. Es perfecta para crear imágenes Docker pequeñas y seguras. Sin embargo, usa `musl libc` en lugar de `glibc`, lo que puede ocasionar problemas de compatibilidad con algunas aplicaciones.
+
+Para un enfoque aún más minimalista, especialmente para lenguajes compilados, considera usar imágenes sin distribución (`distroless`):
+
+```dockerfile
+FROM gcr.io/distroless/static-debian11
+```
+
+Las imágenes sin distribución contienen solo tu aplicación y sus dependencias de tiempo de ejecución. No contienen gestores de paquetes, shells, ni otros programas que esperarías encontrar en una distribución estándar de Linux. Esto las hace extremadamente pequeñas y seguras.
+
+- Ubuntu: ~72MB
+- Alpine: ~5MB
+- Distroless: ~2MB
+
+### Construcciones Multi-etapa
+
+Te permiten usar una imagen para compilar tu aplicación y otra para ejecutarla. Esta técnica es particularmente poderosa para lenguajes compilados, pero también puede ser útil para lenguajes interpretados.
+
+```dockerfile
+# Etapa de construcción
+FROM openjdk:11 AS builder
+COPY . /app
+# Construye la aplicación
+RUN javac /app/Main.java
+
+# Etapa final
+FROM openjdk:11-jre
+# Copia el archivo binario precompilado de la etapa anterior
+COPY --from=builder /app/Main.class /app/
+# Comando para ejecutar el ejecutable
+CMD ["java", "-cp", "/app", "Main"]
+```
+
+**O usa  jlink para crear un custom JRE**:
+
+```dockerfile
+FROM openjdk:11 AS builder
+WORKDIR /app
+COPY . .
+RUN jlink --add-modules java.base,java.logging --output /javaruntime
+
+FROM alpine:3.18
+COPY --from=builder /javaruntime /opt/java
+COPY --from=builder /app/Main.class /app/
+ENV PATH="/opt/java/bin:${PATH}"
+CMD ["java", "-cp", "/app", "Main"]
+```
+
+Esto crea un JRE mínimo con sólo los módulos que su aplicación necesita.
+
+**O los jars por capas de Spring Boot:**:
+
+```dockerfile
+FROM openjdk:11-jre as builder
+WORKDIR application
+COPY target/*.jar application.jar
+RUN java -Djarmode=layertools -jar application.jar extract
+
+FROM openjdk:11-jre
+WORKDIR application
+COPY --from=builder application/dependencies/ ./
+COPY --from=builder application/spring-boot-loader/ ./
+COPY --from=builder application/snapshot-dependencies/ ./
+COPY --from=builder application/application/ ./
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+```
