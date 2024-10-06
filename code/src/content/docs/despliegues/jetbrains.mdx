@@ -1,0 +1,76 @@
+---
+title: JetBrains
+description: Instrucciones detalladas para la instalación y activación de productos JetBrains.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+### Configuración del Proxy
+
+<Steps>
+1. **Abrir Configuración de Proxy en JetBrains:**
+
+
+    Ve a la configuración de Proxy.
+
+   - Selecciona "Manual proxy settings - HTTP".
+     - **Hostname:** `localhost`
+     - **Port:** `80`
+
+2. **Exclusiones del Proxy:**
+
+   Configura las siguientes direcciones para que no usen el proxy:
+   ```
+   jetbrains.com, www.jetbrains.com, download.jetbrains.com, plugins.jetbrains.com, github.com, *.github.com
+   ```
+</Steps>
+
+### Activación del Producto
+
+<Steps>
+1. **Seleccionar Método de Activación:**
+
+   Abre la pantalla de activación del producto JetBrains.
+
+   Selecciona la opción "Código de activación".
+
+2. **Ingresar el Código de Activación:**
+
+   Copia y pega el siguiente código de activación:
+   ```
+   [CENSORED]
+   ```
+</Steps>
+
+### Script trial
+
+Resetea el trial de jetbrains con el siguiente script:
+
+   ```sh
+    @echo off
+    REM Delete eval folder with licence key and options.xml which contains a reference to it
+    for %%I in ("WebStorm", "IntelliJ", "CLion", "Rider", "GoLand", "PhpStorm", "Resharper", "PyCharm") do (
+        for /d %%a in ("%USERPROFILE%\.%%I*") do (
+            rd /s /q "%%a/config/eval"
+            del /q "%%a\config\options\other.xml"
+        )
+    )
+
+    SETLOCAL
+    REM Delete registry key and JetBrains folder
+    IF EXIST "%APPDATA%\JetBrains" (
+        del "%APPDATA%\JetBrains\PermanentUserId"
+        del "%APPDATA%\JetBrains\PermanentDeviceId"
+        del "%APPDATA%\JetBrains\*\*.key"
+        del "%APPDATA%\JetBrains\*\*.license"
+        del "%APPDATA%\JetBrains\*\bl"
+        del "%APPDATA%\JetBrains\*\crl"
+    )
+
+    REG DELETE "HKEY_CURRENT_USER\Software\JavaSoft" /f
+    ENDLOCAL
+
+
+
+   ```
+
+
