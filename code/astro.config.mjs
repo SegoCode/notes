@@ -57,6 +57,7 @@ export default defineConfig({
 						{ slug: 'despliegues/syncthing' },
 						{ slug: 'despliegues/portainer' },
 						{ slug: 'despliegues/puppeter' },
+						{ slug: 'despliegues/jetbrains' },
 					],
 				},
 				{
