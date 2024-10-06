@@ -1,0 +1,115 @@
+
+---
+title: Título de la Documentación
+description: Descripción de la documentación
+---
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+### Antes de Empezar
+
+Asegúrate de que todo esté configurado correctamente en tu sistema.
+
+En **Sistema Operativo**, sigue las instrucciones para asegurarte de que todo funcione bien.
+
+<LinkCard
+title="Guía relacionada"
+description="Enlace a documentación oficial sobre el tema."
+href="https://enlace-a-documentacion.com"/>
+
+### Primer Paso
+
+<Steps>
+1. **Realiza una acción importante:**
+
+   Ejecuta el siguiente comando:
+   ```
+   comando --opción
+   ``` 
+   Sigue las instrucciones en pantalla:
+   <Steps>
+   1. Selecciona una opción.
+   2. Configura algo.
+   3. Completa una acción.
+   4. Confirma los detalles.
+   5. Guarda la configuración.
+   </Steps>
+
+2. **Espera a que el proceso termine:**
+     
+     Continúa con el siguiente paso una vez completado.
+</Steps>
+
+### Configuración Adicional
+
+<Steps>
+1. **Verifica una lista de elementos:**
+
+    Ejecuta el siguiente comando:
+    ```
+    lista --opciones
+    ```
+
+2. **Exporta información relevante:**
+
+   Ejecuta el siguiente comando:
+   ```
+   exportar --opción=valor
+   ```
+
+   Copia la información y realiza la acción correspondiente en el sistema.
+
+3. **Configura el sistema:**
+
+   Ejecuta el siguiente comando:
+   ```
+   config --global opción
+   ```
+
+4. **Configura tu nombre y correo:**
+
+   Ejecuta los siguientes comandos:
+   ```
+   config --global user.name Nombre
+   ```
+   ```
+   config --global user.email Correo
+   ```
+
+5. **Configura el sistema para realizar acciones automáticamente:**
+
+   Ejecuta el siguiente comando:
+   ```
+   config --global auto.true
+   ```
+</Steps>
+
+:::caution
+Ten en cuenta posibles problemas y cómo resolverlos.
+:::
+
+### Solución de problemas
+- Revisa configuraciones en archivos locales.
+- Asegúrate de que las rutas y opciones estén correctamente configuradas.
+- Usa el siguiente comando para verificar la configuración:
+  ```
+  verificar --configuración
+  ```
+
+<CardGrid>
+  <LinkCard href="https://enlace1.com" title="Título 1" description="Descripción del enlace 1." />
+  <LinkCard href="https://enlace2.com" title="Título 2" description="Descripción del enlace 2." />
+  <LinkCard href="https://enlace3.com" title="Título 3" description="Descripción del enlace 3." />
+  <LinkCard href="https://enlace4.com" title="Título 4" description="Descripción del enlace 4." />
+  <LinkCard href="https://enlace5.com" title="Título 5" description="Descripción del enlace 5." />
+  <LinkCard href="https://enlace6.com" title="Título 6" description="Descripción del enlace 6." />
+</CardGrid>
+
+<Aside>
+Aquí puedes colocar notas adicionales o explicaciones.
+</Aside>
+
+<Aside type="tip">
+Este es un consejo o sugerencia útil para el usuario.
+</Aside>
