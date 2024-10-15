@@ -36,6 +36,7 @@ export default defineConfig({
 						{ slug: 'maven/instalar' },
 						{ slug: 'maven/compile' },
 						{ slug: 'maven/errores' },
+						{ slug: 'maven/wrapper' },
 					],
 				},
 				{
