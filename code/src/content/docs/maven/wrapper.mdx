@@ -1,0 +1,77 @@
+---
+title: Maven wrapper
+description: Maven Wrapper para garantizar que todos los desarrolladores utilicen la misma versión de Apache Maven sin necesidad de instalaciones manuales.
+---
+
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Maven Wrapper sirve para garantizar que todos los desarrolladores utilicen la misma versión de Apache Maven sin necesidad de instalaciones manuales.
+
+<Steps>  
+1. **Instalar el plugin Maven Wrapper:**
+
+   Añade el plugin en el archivo `pom.xml` de tu proyecto:
+   ```xml
+   <pluginManagement>
+     <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-wrapper-plugin</artifactId>
+         <version>3.3.1</version>
+       </plugin>
+     </plugins>
+   </pluginManagement>
+   ```
+
+2. **Ejecutar el comando para configurar el Wrapper:**
+
+   ```bash
+   mvn wrapper:wrapper
+   ```
+
+   Esto creará los archivos `mvnw`, `mvnw.cmd` y el directorio `.mvn` en tu proyecto que usaras a partir de ahora:
+
+   ```bash
+   mvnw.cmd clean install
+   ```
+
+</Steps>
+
+### Especificar la versión de Maven
+
+<Steps>  
+1. **Especificar una versión de Maven personalizada:**
+
+   Puedes ejecutar el siguiente comando para elegir una versión específica:
+   ```bash
+   mvn wrapper:wrapper -Dmaven=3.4.5
+   ```
+
+   O bien, modificar el archivo `.mvn/wrapper/maven-wrapper.properties`:
+   ```properties
+   distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.5.4/apache-maven-3.5.4-bin.zip
+   ```
+</Steps>
+
+### Usando autenticación
+
+
+**Autenticación básica para descargar Maven desde un servidor protegido:**
+
+   Configura las variables de entorno:
+   ```bash
+   export MVNW_USERNAME=tu_usuario
+   export MVNW_PASSWORD=tu_contraseña
+   ```
+
+O añade las credenciales directamente en el archivo `maven-wrapper.properties`:
+```properties
+distributionUrl=https://username:password@<yourserver>/maven2/org/apache/maven/apache-maven/3.2.1/apache-maven-3.2.1-bin.zip
+```
+
+
+
+<CardGrid>  
+  <LinkCard href="https://maven.apache.org/guides/index.html" title="Guía de Maven" description="Documentación oficial de Apache Maven" />  
+  <LinkCard href="https://maven.apache.org/wrapper/" title="Maven Wrapper" description="Guía oficial sobre Maven Wrapper" />  
+</CardGrid>
