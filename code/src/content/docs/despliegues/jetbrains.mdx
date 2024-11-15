@@ -69,8 +69,14 @@ Resetea el trial de jetbrains con el siguiente script:
     REG DELETE "HKEY_CURRENT_USER\Software\JavaSoft" /f
     ENDLOCAL
 
-
-
    ```
 
+<Aside>
 
+Recuerda que para evitar errores de **Heap Out of Memory**, es importante realizar los siguientes ajustes después de la instalación de JetBrains en `Compilation > Build process`:
+
+1. Aumentar el tamaño de Heap local: Configura el valor de `User-local heap size` en 2048 MB.
+
+2. Ajustar las opciones de la JVM: Añade el parámetro: `-Xmx2058m` a la configuración de `User-local VM options`.
+
+</Aside>
