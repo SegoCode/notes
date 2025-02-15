@@ -1,0 +1,83 @@
+# Configuración de Tailscale en Docker con Persistencia
+
+## 1. Crear el Directorio Persistente
+
+En tu Raspberry Pi (o en el host donde corre Docker), crea el directorio para almacenar el estado de Tailscale:
+
+```sh
+mkdir -p /portainer/Files/AppData/Config/tailscale
+```
+
+Este directorio se usará para mantener la configuración y el estado de Tailscale, evitando que se pierda al reiniciar el contenedor o la máquina.
+
+---
+
+## 2. Ejecutar el Contenedor de Tailscale Usando el Directorio Persistente
+
+Utiliza el siguiente comando para correr el contenedor. Asegúrate de reemplazar `tskey-auth-XXXXXXXXXXXXX` por tu clave de autenticación generada desde el panel de administración de Tailscale:
+
+```sh
+docker run -d --name tailscaled \
+  -v /portainer/Files/AppData/Config/tailscale:/var/lib/tailscale \
+  -v /dev/net/tun:/dev/net/tun \
+  --network=host \
+  --cap-add=NET_ADMIN \
+  --cap-add=NET_RAW \
+  -e TS_STATE_DIR=/var/lib/tailscale \
+  -e TS_AUTHKEY=tskey-auth-XXXXXXXXXXXXX \
+  tailscale/tailscale:stable
+```
+
+### 📌 Detalles Importantes del Comando
+
+- **Persistencia**: `-v /portainer/Files/AppData/Config/tailscale:/var/lib/tailscale`
+  - Permite que la información se mantenga entre reinicios.
+- **Acceso a TUN**: `-v /dev/net/tun:/dev/net/tun`
+  - Permite que el contenedor acceda al dispositivo TUN, necesario para la operación de Tailscale.
+- **Red y permisos**:
+  - Se usa `--network=host` junto con `NET_ADMIN` y `NET_RAW` para la gestión de red.
+- **Variables de Entorno**:
+  - `TS_STATE_DIR=/var/lib/tailscale` para definir la ubicación del estado.
+  - `TS_AUTHKEY` permite la autenticación automática.
+
+---
+
+## 3. Verificar y Ajustar la Configuración
+
+### 🔍 Revisar los logs para asegurarse de que el contenedor se inicie sin errores:
+
+```sh
+docker logs tailscaled
+```
+
+### 📌 Verificar el estado de Tailscale:
+
+```sh
+docker exec tailscaled tailscale status
+```
+
+Si ves que aparece **“Logged out”** y una URL para iniciar sesión, puedes forzar la autenticación manualmente:
+
+```sh
+docker exec tailscaled tailscale up --authkey=tskey-auth-XXXXXXXXXXXXX --reset
+```
+
+### 🚀 (Opcional) Configurar como Nodo de Salida:
+
+Si deseas que tu Raspberry Pi actúe como **exit node**, ejecuta:
+
+```sh
+docker exec tailscaled tailscale up --advertise-exit-node --accept-dns=false --reset
+```
+
+📌 El flag `--accept-dns=false` se incluye según lo que requiere Tailscale al modificar configuraciones no predeterminadas.
+
+---
+
+## 4. Configurar Reinicio Automático del Contenedor
+
+Para asegurarte de que el contenedor se reinicie automáticamente después de un reinicio de la Raspberry Pi, actualiza su política de reinicio:
+
+```sh
+docker update --restart unless-stopped tailscaled
+```
