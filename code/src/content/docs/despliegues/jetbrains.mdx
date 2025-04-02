@@ -16,13 +16,14 @@ import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } fr
      - **Hostname:** `localhost`
      - **Port:** `80`
 
-2. **Exclusiones del Proxy:**
+2. **Configura las url de Proxy:**
 
-   Configura las siguientes direcciones para que no usen el proxy:
    ```
    jetbrains.com, www.jetbrains.com, download.jetbrains.com, plugins.jetbrains.com, github.com, *.github.com
    ```
 </Steps>
+
+Esto hará que las conexiones internas de JetBrains se resuelvan en `localhost`, mejorando la privacidad y evitando el envío de telemetría.
 
 ### Activación del Producto
 
@@ -35,15 +36,15 @@ import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } fr
 
 2. **Ingresar el Código de Activación:**
 
-   Copia y pega el siguiente código de activación:
+   Busca en google "FV8EM46DQYC5AW9" para encontrar hilos de foros con códigos de activación actualizados:
    ```
-   [CENSORED]
+    https://gist.github.com/zcroll/f7b9fa6d50e290d81aa148b9c1c9898f
    ```
 </Steps>
 
 ### Script jetbrains trial
 
-Resetea el trial de jetbrains con el siguiente script:
+Resetea el trial de jetbrains en windows con el siguiente script:
 
    ```sh
     @echo off
@@ -71,9 +72,9 @@ Resetea el trial de jetbrains con el siguiente script:
 
    ```
 
-<Aside>
+<Aside type="caution" title="Recuerda">
 
-Recuerda que para evitar errores de **Heap Out of Memory**, es importante realizar los siguientes ajustes después de la instalación de JetBrains en `Compilation > Build process`:
+Para evitar errores de **Heap Out of Memory**, es importante realizar los siguientes ajustes después de la instalación de JetBrains en `Compilation > Build process`:
 
 1. Aumentar el tamaño de Heap local: Configura el valor de `User-local heap size` en 2048 MB.
 
