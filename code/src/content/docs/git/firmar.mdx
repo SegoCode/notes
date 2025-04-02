@@ -8,7 +8,7 @@ import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } fr
 
 Asegúrate de que GPG esté instalado en tu sistema.
 
-En **Windows**, descarga Gpg4win desde https://gpg4win.org/download.html e instálalo siguiendo las instrucciones del instalador. (Este programa es recomendado directamente de la guía de github)
+En **Windows**, descarga Gpg4win desde https://gpg4win.org/download.html e instálalo siguiendo las instrucciones del instalador. (Este programa es recomendado directamente de la guía de github). Si es un **Linux** o **macOS**, simplemente descarga el software recomendado de la guía de GitHub y continúa con la guía normalmente.
 
 <LinkCard
 title="Signing commits by github"
@@ -25,14 +25,12 @@ href="https://docs.github.com/en/authentication/managing-commit-signature-verifi
      gpg --full-generate-key
      ``` 
    Sigue las instrucciones en pantalla:
-   <Steps>
-   1. De tipo de clave selecciona RSA para la clave, presiona **Enter**.
-   2. Tamaño de la clave selecciona o escribe `4096`.
-   3. Duración de la clave selecciona que la clave nunca expire.
-   4. Confirma los detalles presionando `y`.
-   5. Ingresa tu `Nombre_Completo` y correo electrónico, no añadas ningún comentario.
-   6. Establece una contraseña segura y recuérdala.
-   </Steps>
+   - De tipo de clave selecciona RSA para la clave, presiona **Enter**.
+   - Tamaño de la clave selecciona o escribe `4096`.
+   - Duración de la clave selecciona que la clave nunca expire.
+   - Confirma los detalles presionando `y`.
+   - Ingresa tu `Nombre_Completo` y correo electrónico, no añadas ningún comentario.
+   - Establece una contraseña segura y recuérdala.
 
 2. **Espera a que el proceso de generación se complete:**
      
