@@ -1,7 +1,11 @@
 ### Custom ###
 
+# jetbrains
+code/.idea/*
+
 # Build output
 dist/
+
 # Generated types
 .astro/
 
