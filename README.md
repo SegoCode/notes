@@ -18,7 +18,7 @@ Este proyecto tiene como objetivo migrar mis notas en papel y diversas notas acu
 
 - Estatica con JavaScript mínimo, construido con Astro.js para lograr una carga rápida.
 
-- Integración y Despliegue Continuos (CI/CD) configurado con GitHub Actions para automatizar pruebas y despliegues.
+- CI/CD configurado con GitHub Actions para automatizar pruebas y despliegues.
 
 
 ## Quick Start & Information
