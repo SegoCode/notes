@@ -59,6 +59,7 @@ export default defineConfig({
 						{ slug: 'despliegues/portainer' },
 						{ slug: 'despliegues/puppeter' },
 						{ slug: 'despliegues/jetbrains' },
+						{ slug: 'despliegues/speedtest' },
 					],
 				},
 				{

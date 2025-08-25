@@ -1,0 +1,90 @@
+---
+title: Speedtest Monitor
+description: Monitor de velocidad de internet con dashboard.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Este proyecto proporciona una solución para monitorizar la velocidad de tu conexión a internet y visualizar los resultados en un dashboard. Utiliza `speedtest-cli` para realizar las pruebas y un script de Python para registrar los datos.
+
+### Despliegue con Docker
+
+El siguiente comando despliega el servicio directamente, descargando una imagen base de Python, instalando las dependencias y ejecutando el script.
+
+- **`-d`**: Ejecuta el contenedor en segundo plano.
+- **`--name speedtest-dashboard`**: Asigna un nombre al contenedor.
+- **`-p 8000:8000`**: Mapea el puerto 8000 del host al puerto 8000 del contenedor.
+- **`-v "$(pwd)":/app`**: Monta el directorio actual en `/app` dentro del contenedor para persistir los datos.
+- **`-w /app`**: Establece `/app` como el directorio de trabajo.
+- **`--restart unless-stopped`**: Reinicia el contenedor automáticamente a menos que se detenga manualmente.
+- **`python:3.9-slim`**: Imagen de Docker a utilizar.
+- **`sh -c "..."`**: Comando que se ejecuta al iniciar el contenedor, instalando dependencias y lanzando el script.
+
+```bash
+docker run -d \
+  --name speedtest-dashboard \
+  -p 8000:8000 \
+  -v "$(pwd)":/app \
+  -w /app \
+  --restart unless-stopped \
+  python:3.9-slim \
+  sh -c "pip install speedtest-cli pandas flask && python script.py"
+```
+
+### Opciones de Despliegue Adicionales
+
+Para un enfoque más estructurado, puedes construir una imagen de Docker personalizada usando un `Dockerfile`.
+
+<Steps>
+1. **Crea un `Dockerfile`:**
+
+   Crea un archivo llamado `Dockerfile` en la raíz de tu proyecto con el siguiente contenido:
+
+   ```dockerfile
+   FROM python:3.9-slim
+   WORKDIR /app
+   COPY requirements.txt .
+   RUN pip install --no-cache-dir -r requirements.txt
+   COPY . .
+   CMD ["python", "script.py"]
+   ```
+
+2. **Crea un archivo `requirements.txt`:**
+
+   Este archivo listará las dependencias de Python:
+
+   ```
+   speedtest-cli
+   pandas
+   flask
+   ```
+
+3. **Construye y ejecuta la imagen:**
+
+   ```bash
+   # Construir la imagen
+   docker build -t speedtest-dashboard .
+
+   # Ejecutar el contenedor
+   docker run -d \
+     --name speedtest-dashboard \
+     -p 8000:8000 \
+     --restart unless-stopped \
+     speedtest-dashboard
+   ```
+</Steps>
+
+<Aside>
+Esta segunda opción es más recomendable para entornos de producción, ya que empaqueta la aplicación y sus dependencias en una imagen portable y versionable.
+</Aside>
+
+### Backend (script.py)
+
+```python
+# El código del backend se añadirá aquí.
+```
+
+### Frontend (templates/index.html)
+
+```html
+<!-- El código del frontend se añadirá aquí. -->
+```
