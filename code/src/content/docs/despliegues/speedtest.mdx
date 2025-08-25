@@ -79,12 +79,558 @@ Esta segunda opción es más recomendable para entornos de producción, ya que e
 
 ### Backend (script.py)
 
+El script de Python utiliza `speedtest-cli` para realizar pruebas de velocidad cada 30 minutos y expone un servidor web en el puerto 8000 para visualizar los resultados.
+
 ```python
-# El código del backend se añadirá aquí.
+import http.server
+import json
+import logging
+import os
+import socketserver
+import threading
+import time
+from datetime import datetime, timezone
+from speedtest import Speedtest
+
+# --- Threading Lock ---
+data_lock = threading.Lock()
+
+
+# --- Logging Configuration ---
+# Defines the name of the log file.
+log_file = "logs.txt"
+# Clears the log file on startup if it exceeds 1MB to prevent it from growing indefinitely.
+if os.path.exists(log_file) and os.path.getsize(log_file) > 1_000_000: # 1MB
+    os.remove(log_file)
+    
+# Configures logging to output to both a file and the console.
+logging.basicConfig(
+    level=logging.INFO, # Set the minimum level of messages to log.
+    format="%(asctime)s - %(levelname)s - %(message)s", # Define the format of the log messages.
+    handlers=[
+        logging.FileHandler(log_file), # Log messages to a file.
+        logging.StreamHandler() # Also log messages to the console.
+    ]
+)
+
+# --- Data Handling ---
+# Defines the name of the JSON file used to store speed test results.
+data_file = "data.json"
+# Initializes an in-memory list to hold the speed test data.
+data = []
+
+def load_data():
+    """Loads speed test data from the JSON file into the global 'data' list."""
+    global data
+    # Use a lock to prevent race conditions when accessing the data from multiple threads.
+    with data_lock:
+        # Check if the data file already exists.
+        if os.path.exists(data_file):
+            try:
+                # Open and read the JSON file.
+                with open(data_file, "r") as f:
+                    data = json.load(f)
+                logging.info(f"Loaded {len(data)} existing records from {data_file}")
+            # Handle cases where the file is empty, corrupted, or doesn't exist.
+            except (json.JSONDecodeError, FileNotFoundError):
+                logging.warning(f"Could not read or decode {data_file}. Starting with an empty list.")
+                data = []
+        else:
+            logging.info("No data file found. Starting with an empty list.")
+            data = []
+
+def save_data():
+    """Saves the in-memory data to the JSON file, keeping only the last 500 records."""
+    global data
+    # Use a lock to ensure data integrity during file writes.
+    with data_lock:
+        # Keep only the last 500 records to prevent the file from growing too large.
+        data = data[-500:]
+        try:
+            # Write the data to the JSON file with indentation for readability.
+            with open(data_file, "w") as f:
+                json.dump(data, f, indent=2)
+            logging.info(f"Data saved. Total records: {len(data)}")
+        except Exception as e:
+            logging.error(f"Failed to save data: {e}")
+
+def perform_test():
+    """Performs a single speed test using the speedtest-cli library and saves the results."""
+    global data
+    try:
+        logging.info("--- Starting new speed test ---")
+        # Initialize the Speedtest client.
+        s = Speedtest()
+        
+        logging.info("Finding the best server...")
+        # Let the library automatically find the best server based on ping.
+        s.get_best_server()
+        
+        # Safely access server details, providing default values if they are not available.
+        server_name = s.results.server.get('name', 'Unknown Server')
+        server_location = s.results.server.get('location', 'N/A')
+        server_country = s.results.server.get('country', 'N/A')
+        logging.info(f"Server found: {server_name} in {server_location}, {server_country}")
+        
+        logging.info("Performing download test...")
+        # Measure download speed and convert it from bits/s to Mbps.
+        download = round(s.download() / 1e6, 2) 
+        logging.info(f"Download test finished: {download} Mbps")
+        
+        logging.info("Performing upload test...")
+        # Measure upload speed and convert it from bits/s to Mbps.
+        upload = round(s.upload() / 1e6, 2) 
+        logging.info(f"Upload test finished: {upload} Mbps")
+        
+        # Get the ping (latency) in milliseconds.
+        ping = round(s.results.ping, 2)
+        
+        # Get the current timestamp in UTC ISO 8601 format.
+        timestamp = datetime.now(timezone.utc).isoformat()
+        
+        # Structure the test results into a dictionary.
+        test_data = {
+            "timestamp": timestamp,
+            "ping": ping,
+            "download": download,
+            "upload": upload,
+            "server": server_name
+        }
+        
+        # Append the new data to the in-memory list under a lock.
+        with data_lock:
+            data.append(test_data)
+        
+        # Save the updated list to the JSON file.
+        save_data()
+        logging.info(f"--- Speed test successful: Ping: {ping}ms, Down: {download}Mbps, Up: {upload}Mbps ---")
+        
+    except Exception as e:
+        # Log any exceptions that occur during the test.
+        logging.error(f"Speedtest failed: {e}", exc_info=True)
+
+def speedtest_loop():
+    """Continuously runs the speed test at a regular interval in a loop."""
+    # Run the first test immediately on application startup.
+    perform_test() 
+    while True:
+        # Set the interval between tests (e.g., 1800 seconds = 30 minutes).
+        interval = 1800
+        logging.info(f"Sleeping for {int(interval / 60)} minutes until the next test.")
+        # Wait for the specified interval before running the next test.
+        time.sleep(interval)
+        perform_test()
+
+# --- Web Server ---
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    """Custom HTTP request handler to serve the dashboard and handle API requests."""
+    
+    def do_POST(self):
+        """Handles POST requests, specifically for triggering a manual speed test."""
+        # Check if the request path is for running a test.
+        if self.path == '/run-test':
+            logging.info("Manual test triggered via API.")
+            # Run the test in a new thread to avoid blocking the HTTP server.
+            test_thread = threading.Thread(target=perform_test)
+            test_thread.start()
+            # Respond with 202 Accepted to indicate the request was received.
+            self.send_response(202) 
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"message": "Test initiated."}')
+            return
+        
+        # If the path is not recognized, respond with 404 Not Found.
+        self.send_response(404)
+        self.end_headers()
+
+    def end_headers(self):
+        """Overrides the default method to add headers that prevent browser caching."""
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
+# --- Application Startup ---
+if __name__ == "__main__":
+    # Load any existing data from the JSON file.
+    load_data()
+    
+    # Start the background thread for running automatic, scheduled speed tests.
+    # The 'daemon=True' flag ensures the thread will exit when the main program does.
+    thread = threading.Thread(target=speedtest_loop, daemon=True)
+    thread.start()
+    
+    # Start the web server to serve the HTML dashboard.
+    # It will run forever, handling HTTP requests.
+    with socketserver.TCPServer(("", 8000), MyHandler) as httpd:
+        logging.info("Server started at http://localhost:8000")
+        httpd.serve_forever()
 ```
 
-### Frontend (templates/index.html)
+### Frontend (index.html)
+
+El dashboard proporciona una interfaz web moderna para visualizar los resultados de las pruebas de velocidad, incluyendo gráficos, estadísticas y logs en tiempo real.
 
 ```html
-<!-- El código del frontend se añadirá aquí. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedtest Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f7f6; min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: #4a90e2; color: white; padding: 30px; text-align: center; border-radius: 16px 16px 0 0; }
+        .header h1 { font-size: 2.5rem; font-weight: 700; }
+        .card { background: #ffffff; border-radius: 16px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); margin-top: 20px; overflow: hidden; }
+        .card-header { padding: 20px; border-bottom: 1px solid #e2e8f0; }
+        .card-header h2 { font-size: 1.3rem; font-weight: 600; }
+        .card-content { padding: 20px; }
+        .filters { display: flex; gap: 20px; align-items: center; }
+        .filters label { font-weight: 600; }
+        .filters select, .filters button { padding: 10px 15px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { background: #f8f9fa; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; }
+        .stat-card h3 { font-size: 0.9rem; color: #555; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        .stat-card .value { font-size: 1.8rem; font-weight: 700; color: #111; }
+        .stat-card .unit { font-size: 0.8rem; color: #777; margin-left: 4px; }
+        .chart-container { height: 450px; }
+        #logContent { background-color: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: 'Courier New', Courier, monospace; font-size: 14px; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        th { background-color: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
+        tr:hover { background-color: #f1f3f5; }
+        .ping-cell { color: #f59e0b; font-weight: 600; }
+        .download-cell { color: #10b981; font-weight: 600; }
+        .upload-cell { color: #ef4444; font-weight: 600; }
+        .no-data { text-align: center; padding: 40px; color: #777; font-style: italic; }
+    </style>
+</head>
+<body>
+    <!-- Main container for the dashboard -->
+    <div class="container">
+        <!-- Header section -->
+        <div class="header"><h1>🌐 Internet Speed Dashboard</h1></div>
+
+        <!-- Filters card -->
+        <div class="card">
+            <div class="card-header filters">
+                <label for="dayFilter">Filter by Day:</label>
+                <select id="dayFilter"><option value="all">All Days</option></select>
+                <button onclick="refreshAllData()">🔄 Refresh Data</button>
+                <button id="runTestBtn" onclick="runTestNow()">🚀 Run Test Now</button>
+            </div>
+        </div>
+
+        <!-- Average statistics card -->
+        <div class="card">
+            <div class="card-header"><h2>📊 Average Statistics</h2></div>
+            <div class="card-content stats-grid">
+                <div class="stat-card"><h3>Avg Ping</h3><div class="value" id="avgPing">--<span class="unit">ms</span></div></div>
+                <div class="stat-card"><h3>Avg Download</h3><div class="value" id="avgDownload">--<span class="unit">Mbps</span></div></div>
+                <div class="stat-card"><h3>Avg Upload</h3><div class="value" id="avgUpload">--<span class="unit">Mbps</span></div></div>
+                <div class="stat-card"><h3>Total Tests</h3><div class="value" id="totalTests">--</div></div>
+            </div>
+        </div>
+
+        <!-- Chart card -->
+        <div class="card">
+            <div class="card-header"><h2>📈 Speed Over Time</h2></div>
+            <div class="card-content chart-container"><canvas id="speedChart"></canvas></div>
+        </div>
+
+        <!-- Detailed results table card -->
+        <div class="card">
+            <div class="card-header"><h2>📋 Detailed Test Results</h2></div>
+            <div class="card-content" style="max-height: 400px; overflow-y: auto;">
+                <table>
+                    <thead><tr><th>Timestamp</th><th>Server</th><th>Ping</th><th>Download</th><th>Upload</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Application logs card -->
+        <div class="card">
+            <div class="card-header"><h2>📝 Application Logs</h2></div>
+            <div class="card-content"><pre id="logContent">Loading logs...</pre></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global Variables ---
+        let allData = []; // This array will store all the speed test data fetched from the server.
+        let chart = null;   // This variable will hold the Chart.js instance, so it can be destroyed and recreated.
+
+        /**
+         * Fetches a resource from a URL.
+         * It appends a timestamp query parameter to the URL to bypass the browser cache,
+         * ensuring that the latest version of the file is always retrieved.
+         * @param {string} url - The URL of the resource to fetch.
+         * @returns {Promise<Response>} A promise that resolves to the fetch Response object.
+         */
+        async function fetchData(url) {
+            // Use the fetch API to get the resource.
+            const response = await fetch(`${url}?t=${Date.now()}`);
+            // Check if the request was successful.
+            if (!response.ok) {
+                // If not, throw an error with the status text.
+                throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+            }
+            return response;
+        }
+
+        /**
+         * Loads the speed test data from the 'data.json' file on the server.
+         * After fetching, it populates the day filter and updates all display components.
+         */
+        async function loadData() {
+            try {
+                // Fetch the JSON data file.
+                const response = await fetchData("data.json");
+                // Parse the JSON response into the global 'allData' array.
+                allData = await response.json();
+                // Update the UI with the new data.
+                populateDayFilter(allData);
+                updateDisplay();
+            } catch (e) {
+                // Log any errors to the console.
+                console.error("Failed to load speedtest data:", e);
+                // If the table is empty, show a user-friendly error message.
+                if (document.getElementById("tableBody").innerHTML === "") {
+                    document.querySelector("#tableBody").innerHTML = '<tr><td colspan="4" class="no-data">Could not load data.json. The first test might be running.</td></tr>';
+                }
+            }
+        }
+
+        /**
+         * Loads and displays the application logs from the 'logs.txt' file.
+         */
+        async function loadLogs() {
+            try {
+                // Fetch the logs text file.
+                const response = await fetchData("logs.txt");
+                // Get the text content from the response.
+                const text = await response.text();
+                const logElement = document.getElementById("logContent");
+                // Set the text content of the log display element.
+                logElement.textContent = text;
+                // Automatically scroll the log display to the most recent entries at the bottom.
+                logElement.scrollTop = logElement.scrollHeight;
+            } catch (e) {
+                console.error("Failed to load logs:", e);
+                // Display an error message if the logs can't be loaded.
+                document.getElementById("logContent").textContent = "Could not load logs.txt.";
+            }
+        }
+        
+        /**
+         * A utility function to refresh both the speed test data and the application logs.
+         */
+        function refreshAllData() {
+            loadData();
+            loadLogs();
+        }
+
+        /**
+         * Sends a POST request to the server to trigger a new, on-demand speed test.
+         */
+        async function runTestNow() {
+            const runBtn = document.getElementById("runTestBtn");
+            // Disable the button to prevent multiple clicks while a test is running.
+            runBtn.disabled = true;
+            runBtn.textContent = "Testing...";
+
+            try {
+                // Send a POST request to the '/run-test' endpoint.
+                const response = await fetch('/run-test', { method: 'POST' });
+                // The server should respond with 202 (Accepted).
+                if (response.status !== 202) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                // After triggering the test, wait a bit for it to complete before refreshing the data.
+                setTimeout(() => {
+                    refreshAllData();
+                    // Re-enable the button after the process is complete.
+                    runBtn.disabled = false;
+                    runBtn.textContent = "🚀 Run Test Now";
+                }, 45000); // A 45-second delay should be sufficient for most tests.
+            } catch (e) {
+                console.error("Failed to trigger test:", e);
+                alert("Failed to start the test. Check the console for details.");
+                // Re-enable the button in case of an error.
+                runBtn.disabled = false;
+                runBtn.textContent = "🚀 Run Test Now";
+            }
+        }
+
+        /**
+         * Populates the 'dayFilter' dropdown with unique days extracted from the test data.
+         * This allows the user to filter the displayed results by a specific day.
+         * @param {Array} data - The array of speed test data objects.
+         */
+        function populateDayFilter(data) {
+            const dayFilter = document.getElementById("dayFilter");
+            const existingSelection = dayFilter.value; // Save the currently selected day.
+            
+            // Use a Set to get a list of unique days from the timestamps.
+            const uniqueDays = [...new Set(data.map(item => {
+                const date = new Date(item.timestamp);
+                // Format the date as 'YYYY-MM-DD'.
+                return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+            }))];
+            
+            // Clear the existing options and add the default "All Days" option.
+            dayFilter.innerHTML = '<option value="all">All Days</option>';
+            // Sort days in descending order and create an <option> for each.
+            uniqueDays.sort().reverse().forEach(day => {
+                const option = document.createElement("option");
+                option.value = day;
+                option.textContent = day;
+                dayFilter.appendChild(option);
+            });
+            
+            // If the previously selected day still exists in the list, restore the selection.
+            if (Array.from(dayFilter.options).some(opt => opt.value === existingSelection)) {
+                dayFilter.value = existingSelection;
+            }
+        }
+
+        /**
+         * Filters the global 'allData' array based on the day selected in the dropdown.
+         * @returns {Array} An array of data objects filtered by the selected day.
+         */
+        function getFilteredData() {
+            const selectedDay = document.getElementById("dayFilter").value;
+            // If "All Days" is selected, return the full dataset.
+            if (selectedDay === "all") return allData;
+
+            // Otherwise, filter the data to include only items from the selected day.
+            return allData.filter(item => {
+                const date = new Date(item.timestamp);
+                const itemDay = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+                return itemDay === selectedDay;
+            });
+        }
+
+        /**
+         * Updates the average statistics cards (Ping, Download, Upload, Total Tests).
+         * @param {Array} data - The data to use for calculating the statistics.
+         */
+        function updateStats(data) {
+            const [avgPingEl, avgDownloadEl, avgUploadEl, totalTestsEl] = [
+                document.getElementById("avgPing"), document.getElementById("avgDownload"),
+                document.getElementById("avgUpload"), document.getElementById("totalTests")
+            ];
+
+            // If there's no data, display default placeholders.
+            if (data.length === 0) {
+                avgPingEl.innerHTML = '--<span class="unit">ms</span>';
+                avgDownloadEl.innerHTML = '--<span class="unit">Mbps</span>';
+                avgUploadEl.innerHTML = '--<span class="unit">Mbps</span>';
+                totalTestsEl.textContent = '0';
+                return;
+            }
+
+            // Calculate the average for each metric.
+            const avgPing = (data.reduce((sum, item) => sum + item.ping, 0) / data.length).toFixed(1);
+            const avgDownload = (data.reduce((sum, item) => sum + item.download, 0) / data.length).toFixed(1);
+            const avgUpload = (data.reduce((sum, item) => sum + item.upload, 0) / data.length).toFixed(1);
+
+            // Update the HTML elements with the calculated values.
+            avgPingEl.innerHTML = `${avgPing}<span class="unit">ms</span>`;
+            avgDownloadEl.innerHTML = `${avgDownload}<span class="unit">Mbps</span>`;
+            avgUploadEl.innerHTML = `${avgUpload}<span class="unit">Mbps</span>`;
+            totalTestsEl.textContent = data.length;
+        }
+
+        /**
+         * Updates the line chart with the provided data.
+         * @param {Array} data - The data to display on the chart.
+         */
+        function updateChart(data) {
+            const ctx = document.getElementById("speedChart").getContext("2d");
+            // If a chart instance already exists, destroy it before creating a new one.
+            if (chart) chart.destroy(); 
+            // If there's no data, clear the canvas.
+            if (data.length === 0) {
+                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                 return;
+            }
+
+            // Create a new Chart.js instance.
+            chart = new Chart(ctx, {
+                type: "line", // Line chart for time-series data.
+                data: {
+                    // Use the time part of the timestamp for the x-axis labels.
+                    labels: data.map(d => new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})),
+                    datasets: [
+                        { label: "Download (Mbps)", data: data.map(d => d.download), borderColor: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.1)", tension: 0.4, fill: true },
+                        { label: "Upload (Mbps)", data: data.map(d => d.upload), borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.1)", tension: 0.4, fill: true },
+                        // Assign Ping to a secondary Y-axis because its scale is different.
+                        { label: "Ping (ms)", data: data.map(d => d.ping), borderColor: "#f59e0b", backgroundColor: "rgba(245, 158, 11, 0.1)", tension: 0.4, fill: true, yAxisID: 'yPing' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Speed (Mbps)' } },
+                        yPing: { type: 'linear', position: 'right', beginAtZero: true, title: { display: true, text: 'Ping (ms)' }, grid: { drawOnChartArea: false } } // Secondary axis config.
+                    }
+                }
+            });
+        }
+
+        /**
+         * Updates the detailed results table with the provided data.
+         * @param {Array} data - The data to display in the table.
+         */
+        function updateTable(data) {
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = ""; // Clear existing rows.
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="no-data">No data for the selected day.</td></tr>';
+                return;
+            }
+            // Display data in reverse chronological order (newest first).
+            [...data].reverse().forEach(item => {
+                const row = document.createElement("tr");
+                // Convert the UTC timestamp from the server to the user's local time zone.
+                const localTimestamp = new Date(item.timestamp).toLocaleString(); 
+                row.innerHTML = `<td>${localTimestamp}</td><td>${item.server || 'N/A'}</td><td class="ping-cell">${item.ping} ms</td><td class="download-cell">${item.download} Mbps</td><td class="upload-cell">${item.upload} Mbps</td>`;
+                tableBody.appendChild(row);
+            });
+        }
+
+        /**
+         * Main function to update all UI components with the currently filtered data.
+         */
+        function updateDisplay() {
+            const filteredData = getFilteredData();
+            updateStats(filteredData);
+            updateChart(filteredData);
+            updateTable(filteredData);
+        }
+
+        // --- Event Listeners ---
+        // This runs when the initial HTML document has been completely loaded and parsed.
+        document.addEventListener("DOMContentLoaded", () => {
+            // Perform the initial data load when the page is ready.
+            refreshAllData();
+            // Add an event listener to the day filter to update the display when the selection changes.
+            document.getElementById("dayFilter").addEventListener("change", updateDisplay);
+            // Set up an interval to automatically refresh the data every 30 seconds.
+            setInterval(refreshAllData, 30000);
+        });
+    </script>
+</body>
+</html>
 ```
+
+<Aside>
+El dashboard incluye funcionalidades avanzadas como filtrado por días, gráficos interactivos con Chart.js, ejecución manual de pruebas y visualización de logs en tiempo real. Los datos se actualizan automáticamente cada 30 segundos.
+</Aside>
