@@ -28,11 +28,11 @@ Section 2 - License Conditions
 	excluding NonAdapted Material cases in 2.4 section.
 	
 2.2 Redistributions for any NonAdapted Material or Adapted Material, either 
-        in source code or binary form, must include the original copyright notice, 
-        this license, the disclaimer, and comply with the requirements specified 
-        herein. For binary form redistributions, these documents must be included 
-        in any provided documentation or materials or a clearly accessible link 
-        to this license ensuring that recipients can easily review the license terms.
+    in source code or binary form, must include the original copyright notice, 
+    this license, the disclaimer, and comply with the requirements specified 
+    herein. For binary form redistributions, these documents must be included 
+    in any provided documentation or materials or a clearly accessible link 
+    to this license ensuring that recipients can easily review the license terms.
 
 2.3 For any Adapted Material, whether in source code or binary form, and for any 
 	instance of the licensed material utilized in applications accessible over
@@ -73,3 +73,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
