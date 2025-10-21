@@ -25,6 +25,7 @@ export default defineConfig({
 						{ slug: 'git/githooks' },
 						{ slug: 'git/conventional' },
 						{ slug: 'git/herramientas' },
+                        { slug: 'git/repositorio' },
 					],
 				},
 				{
