@@ -1,0 +1,220 @@
+---
+title: Repositorio Template
+description: Workflows, flujo de trabajo y versionado automatizado.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Estrategia de ramas y los workflows de CI/CD del repositorio manteniendo una separación clara entre desarrollo (`develop`) y producción (`main`), reducir pasos manuales y garantizar trazabilidad desde cada cambio hasta su liberación. Revisa el **repositorio template**.
+
+<CardGrid>
+  <LinkCard href="https://github.com/SegoCode/template" title="Repositorio Template" description="Código fuente y workflows." />
+  <LinkCard href="/docs/git/conventional" title="Convenciones Git" description="Estándar de mensajes." />
+</CardGrid>
+
+
+
+### Flujo de Trabajo
+
+- El repositorio separa desarrollo (`develop`) de producción (`main`).
+
+- Las ramas de trabajo (`feature/*`, `bugfix/*`, `hotfix/*`) se fusionan en `develop`.
+
+- Cuando acumulas cambios listos para producción, ejecutas la sincronización manual hacia `main`.
+
+- Tras el merge, los workflows automáticos gestionan el etiquetado y la sincronización inversa.
+
+
+```
+feature/nueva-funcionalidad
+        ↓
+   PR a develop (revisión + merge)
+        ↓
+   [Manual] Sync develop → main (crea PR con labels)
+        ↓
+   Merge a main
+        ↓
+   ├─→ Generate Tag (si label auto-tag)
+   └─→ Auto sync main → develop
+```
+
+Los checks automáticos (GitLeaks, Do Not Merge) se ejecutan en paralelo a cada PR.
+
+#### Diagrama General
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│                        FLUJO PRINCIPAL                               │
+├──────────────────────────────────────────────────────────────────────┤
+│  feature/* / bugfix/* / hotfix/*                                     │
+│        │                                                             │
+│        └──(PR)──> develop ──(merge)──┐                               │
+│                                      │                               │
+│                         [Manual Trigger]                             │
+│                                      │                               │
+│                         Sync develop→main (PR auto)                  │
+│                                      │                               │
+│                                  (merge)                             │
+│                                      │                               │
+│        ┌─────────────┬───────────────┴───────────────┐               │
+│        │             │                               │               │
+│   Generate Tag   Auto sync main→develop         Otros checks         │
+│ (si auto-tag)     (hotfix feedback loop)   (GitLeaks / DoNotMerge)   │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+<Tabs>
+  <TabItem label="Vista General">
+
+  ```text
+  feature → PR develop → merge → sync manual → PR a main → merge → tag/issue → auto sync
+  ```
+  </TabItem>
+  <TabItem label="Versionado">
+
+  ```text
+  Último tag: v1.3
+  Merge PR con label auto-tag → genera v1.4 → issue para release → (manual) publicar release
+  ```
+  </TabItem>
+  <TabItem label="Ciclo Hotfix">
+
+  ```text
+  hotfix/... → PR a main (según política) → merge → auto sync main→develop → (si label) nuevo tag
+  ```
+  </TabItem>
+</Tabs>
+
+---
+
+| Workflow | Trigger | Tipo | Acción |
+| -------- | ------- | ---- | ------ |
+| Initialize Repository | workflow_dispatch | Manual | Inicializa plantilla |
+| Sync develop → main | workflow_dispatch | Manual | Crea PR hacia producción |
+| Sync main → develop | push a main | Auto | Refleja hotfixes |
+| Generate Tag | PR closed + label | Condicional | Versiona y crea issue |
+| GitLeaks | push / PR | Auto | Detecta secretos |
+| Greetings | first issue/PR | Auto | Saluda nuevos usuarios |
+| Do Not Merge | PR events | Auto | Bloquea según label |
+| Update License | cambios LICENSE | Auto | Valida licencia |
+
+---
+
+### Initialize Repository
+
+**Archivo:** `initializer.yml`
+**Trigger:** Manual (workflow_dispatch)
+
+Primer paso tras usar la plantilla. Crea la rama `develop`, reemplaza los placeholders `{reponame}` y `{username}` en todos los archivos (excepto workflows), elimina su propio archivo y abre un PR inicial hacia `main`.
+
+Desde *Actions* → "Initialize Repository" → Run workflow.
+
+Si los placeholders no se reemplazan, revisa permisos de escritura en la configuración de Actions del repositorio.
+
+```text
+[Manual trigger] → crea develop → reemplaza placeholders → elimina workflow → PR inicial
+```
+
+---
+
+### Sync from develop to main
+
+**Archivo:** `sync-from-develop-to-main.yml`
+**Trigger:** Manual (workflow_dispatch)
+
+Genera un PR de `develop` hacia `main` añadiendo las labels `auto-sync` y `auto-tag` (las crea si no existen). Revisa el PR, verifica tests y haz merge cuando esté listo. Si no quieres generar tag en ese momento, retira la label `auto-tag` antes del merge.
+
+Desde *Actions* → "Sync from develop to main" → Run workflow.
+
+Si el PR no aparece, confirma que no existe uno abierto previamente con el mismo origen/destino. Si las labels faltan, revisa el log del job para ver errores de permisos.
+
+```text
+[Manual trigger] → genera PR develop→main (auto-sync / auto-tag) → revisión → merge
+```
+
+---
+
+### Sync from main to develop
+
+**Archivo:** `sync-from-main-to-develop.yml`
+**Trigger:** Push a `main` (automático)
+
+Tras cualquier merge en `main`, este workflow mezcla automáticamente esos cambios de vuelta en `develop`. Evita que hotfixes u otros cambios urgentes se pierdan. No requiere intervención.
+
+Si falla por conflictos, resuélvelos manualmente: haz checkout de `develop`, merge `main` localmente, resuelve, commit y push.
+
+```text
+(push a main) → workflow merge main→develop → mantiene ramas alineadas
+```
+
+---
+
+### Generate Tag
+
+**Archivo:** `generate-tag.yml`
+**Trigger:** Pull request cerrado (condicional)
+
+Se ejecuta solo si el PR fue mergeado (no simplemente cerrado) y tiene la label `auto-tag`. Calcula la nueva versión:
+- Sin tags previos → `1.0`
+- Con último tag `A.B` → nuevo `A.(B+1)`
+
+Crea el tag `vA.(B+1)`, lo pushea y genera una issue notificando el nuevo tag con enlace para crear la release formal.
+
+Añade `auto-tag` al PR antes de hacer merge. Si el tag no aparece, verifica que la label estaba presente y que el PR fue mergeado (no solo cerrado). Si el número es incorrecto, comprueba tags previos con formato distinto y ajusta o elimina manualmente.
+
+```text
+PR mergeado con auto-tag → calcula nueva versión → crea tag vX.Y → issue de aviso
+```
+
+---
+
+### GitLeaks
+
+**Trigger:** Push / Pull request (automático)
+
+Escanea el código buscando secretos expuestos (claves API, tokens, contraseñas). Si detecta coincidencias, el workflow falla mostrando archivo y línea en el log. Elimina o rota el secreto inmediatamente, nunca intentes ocultarlo con comentarios. Revoca cualquier token comprometido.
+
+```text
+(push/PR) → escaneo → [ok] o [falla con detalle de archivo/línea]
+```
+
+---
+
+### Greetings
+
+**Trigger:** Primera issue o PR de un usuario (automático)
+
+Publica un mensaje de bienvenida automático. Sin mantenimiento.
+
+```text
+Primer PR/issue usuario → comentario automático
+```
+
+---
+
+### Do Not Merge
+
+**Trigger:** Eventos de PR (automático)
+
+Bloquea el merge si el PR tiene una label específica (ej. `do-not-merge`). Falla el check hasta que retires la label. Actualiza el PR o re-ejecuta el workflow para que vuelva a evaluar.
+
+```text
+PR con label bloqueo → check falla → remover label → check pasa → merge
+```
+
+---
+
+### Update License
+
+**Trigger:** Cambios en archivos LICENSE (automático)
+
+Valida o normaliza el contenido de la licencia. Revisa el log si rechaza un cambio.
+
+```text
+Cambio LICENSE → validación → [ok] o [rechazo]
+```
+
+---
+
+<Aside>
+El versionado usa `major.minor`. Para granularidad `major.minor.patch`, actualiza el workflow `generate-tag.yml`.
+</Aside>
