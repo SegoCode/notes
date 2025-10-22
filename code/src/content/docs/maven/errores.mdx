@@ -28,6 +28,10 @@ import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } fr
 
    Este comando eliminará la carpeta `target`, asegurando un entorno limpio para la siguiente compilación.
 
+    <Aside>
+       En algunos casos la caché interna de Maven impide que `mvn clean` elimine por completo lo generado y la carpeta `target` conserva archivos obsoletos. Si después de limpiar sigue existiendo, elimínala manualmente antes de volver a compilar; Si usas `IntelliJ` y tienes errores de compilación relacionados con clases borra la carpeta `target` manualmente y intenta invalidar las cachés del IDE.
+    </Aside>
+
 3. **Comprobar dónde está el archivo `settings.xml` que está utilizando Maven:**
 
    Para identificar el archivo `settings.xml` en uso, ejecuta:
