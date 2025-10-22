@@ -14,6 +14,7 @@ export default defineConfig({
 			title: 'Mis notas',
 			customCss: ['./src/style/index.css'],
             social: [
+                { icon: 'email', label: 'Email', href: 'https://segocode.github.io/SegoCode/' },
                 { icon: 'github', label: 'GitHub', href: 'https://github.com/SegoCode/notes' },
             ],
 			sidebar: [
