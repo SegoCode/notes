@@ -5,14 +5,25 @@
 }
 
 [data-has-hero] header {
-  border-bottom: 1px solid transparent;
-  background-color: transparent;
+  border-bottom: 2px solid #3d50f5;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
+:root[data-theme='light'] header {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid #3d50f5;
+}
+
+/* Tamaño del título de la página inicial */
 [data-page-title] {
   font-size: 3rem;
 }
 
+/* Hover del selector */
 .sidebar-content a:hover {
     background-color: var(--sl-color-accent-low);
     color: var(--sl-color-white);
