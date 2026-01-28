@@ -215,6 +215,33 @@ Algunos plugins pueden comportarse de manera diferente en el IDE comparado con l
 
 </Aside>
 
+### Configuración de Annotation Processors (MapStruct)
+
+MapStruct es una librería de Java que genera automáticamente código de mapeo entre objetos (DTOs, entidades, etc.) en tiempo de compilación mediante *annotation processing*. En lugar de escribir manualmente los métodos para copiar datos de un objeto a otro, defines interfaces con anotaciones y MapStruct genera la implementación.
+
+Si en IntelliJ IDEA obtienes errores como `annotation not allowed` o no se generan las implementaciones de los Mappers, es probable que la configuración de los procesadores de anotaciones sea incorrecta.
+
+<Steps>
+
+1. **Acceder a la configuración de Annotation Processors:**
+
+   Ve a **Settings** (o **Preferences**) > **Build, Execution, Deployment** > **Compiler** > **Annotation Processors**.
+
+2. **Habilitar y configurar el procesador:**
+
+   Asegúrate de marcar **Enable annotation processing** y configura los campos clave como se indica:
+
+   - **Processor path:** Apunta al JAR de MapStruct descargado desde Maven.
+     Ejemplo: `/Users/user/.m2/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar:/Users/user/.m2/repository/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar:/Users/user/.m2/repository/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar`
+
+   - **Store generated sources relative to:** Configurado en `Module content root`.
+
+   - **Production sources directory:** `target/generated-sources/annotations` (donde se genera el código).
+
+   - **Annotation processor options:** Incluye `mapstruct.defaultComponentModel=spring`, lo que significa que los mappers generados serán beans de Spring con `@Component`.
+
+</Steps>
+
 <CardGrid>
   <LinkCard href="https://maven.apache.org/guides/introduction/introduction-to-the-pom.html" title="Introducción al POM" description="Guía para comprender la estructura del POM." />
   <LinkCard href="https://maven.apache.org/ref/3.6.3/maven-settings/settings.html" title="Configuración del settings.xml" description="Documentación sobre cómo configurar el archivo settings.xml de Maven." />
