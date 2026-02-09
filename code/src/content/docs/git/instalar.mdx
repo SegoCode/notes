@@ -6,6 +6,11 @@ import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } fr
 
 ### Opción 1: Versión portable
 
+<LinkCard
+title="Descargas de Git para macOS"
+description="Instrucciones y opciones de instalación de Git en macOS."
+href="https://git-scm.com/download/mac"/>
+
 <Steps>
 
 1. **Descarga la versión portable de Git:**
@@ -24,9 +29,22 @@ import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } fr
 
    </Aside>
 
-3. **Añade Git al PATH del sistema:**
+3. **Añade Git al PATH del sistema (Windows):**
    
    Haz clic derecho en "**Este PC**" o "**Mi PC**" en el Explorador de Archivos y selecciona Propiedades. Luego, haz clic en **Configuración avanzada del sistema** y después en **Variables de entorno**. Busca la variable **Path** en "**Variables del sistema**" y haz clic en **Editar**. Añade la ruta donde se encuentra el ejecutable de Git.exe (`.\Git\cmd`) y haz clic en Aceptar para guardar los cambios.
+
+4. **Añade Git al PATH del sistema (Linux/macOS):**
+
+   Añade el directorio del ejecutable de Git a la variable `PATH` editando el archivo de configuración de tu shell (`~/.bashrc`, `~/.bash_profile` o `~/.zshrc`):
+
+   ```bash
+   echo 'export PATH=$PATH:/ruta/a/git/bin' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+
+   <Aside>
+   En macOS con zsh (shell por defecto), utiliza `~/.zshrc` en lugar de `~/.bashrc`. Si instalas Git mediante Xcode Command Line Tools (`xcode-select --install`), el ejecutable quedará disponible en el PATH automáticamente.
+   </Aside>
 
 </Steps>
 
