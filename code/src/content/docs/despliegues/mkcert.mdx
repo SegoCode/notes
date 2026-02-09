@@ -1,0 +1,129 @@
+---
+title: Mkcert
+description: Genera certificados SSL de confianza para desarrollo local sin avisos de seguridad.
+---
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Mkcert permite generar certificados SSL/TLS válidos para entornos de desarrollo local. La herramienta crea una Autoridad de Certificación (CA) propia, la registra en los almacenes de confianza del sistema y del navegador, y emite certificados firmados por esa CA para los nombres o direcciones IP que necesites (como `localhost`, `127.0.0.1`, `192.168.x.x` o dominios personalizados como `dev.local`).
+
+<Aside type="tip">
+A diferencia de un certificado autofirmado convencional, los certificados generados por mkcert son reconocidos como válidos por navegadores y herramientas del sistema, ya que la CA local queda instalada como entidad de confianza. Esto elimina los avisos de "no seguro" durante el desarrollo.
+</Aside>
+
+<LinkCard
+title="Repositorio oficial de mkcert"
+description="Código fuente, documentación e instrucciones de instalación."
+href="https://github.com/FiloSottile/mkcert"/>
+
+### Instalación
+
+<Steps>
+
+1. **Instalar mkcert:**
+
+   Dependiendo de tu sistema operativo, ejecuta el comando correspondiente:
+
+   En macOS con Homebrew:
+   ```bash
+   brew install mkcert
+   ```
+
+   En Linux con Homebrew:
+   ```bash
+   brew install mkcert
+   ```
+
+   En Windows con Scoop:
+   ```
+   scoop bucket add extras
+   scoop install mkcert
+   ```
+
+   En Windows con Chocolatey:
+   ```
+   choco install mkcert
+   ```
+
+   <Aside>
+   Si no tienes un gestor de paquetes, puedes descargar los binarios precompilados directamente desde la [página de releases](https://github.com/FiloSottile/mkcert/releases) del repositorio oficial.
+   </Aside>
+
+2. **Instalar la CA local en el sistema:**
+
+   Ejecuta el siguiente comando para crear e instalar la Autoridad de Certificación local en los almacenes de confianza del sistema y del navegador:
+
+   ```bash
+   mkcert -install
+   ```
+
+   Este paso solo es necesario realizarlo una vez. Mkcert registrará la CA raíz en el almacén del sistema, Firefox (si está disponible) y Java (si se detecta `JAVA_HOME`).
+
+   <Aside type="caution">
+   La clave privada de la CA se almacena en tu equipo. No la compartas ni la expongas fuera de tu entorno de desarrollo, ya que cualquier persona con acceso a ella podría generar certificados válidos para tu sistema.
+   </Aside>
+
+</Steps>
+
+### Generar certificados
+
+<Steps>
+
+1. **Crear un certificado para los dominios necesarios:**
+
+   Especifica los nombres de host o direcciones IP para los que necesitas el certificado:
+
+   ```bash
+   mkcert localhost 127.0.0.1 ::1
+   ```
+
+   Esto generará dos archivos en el directorio actual: `localhost+2.pem` (certificado) y `localhost+2-key.pem` (clave privada).
+
+2. **Usar dominios personalizados:**
+
+   También puedes generar certificados para dominios personalizados o IPs de red local:
+
+   ```bash
+   mkcert miapp.local 192.168.1.50
+   ```
+
+   <Aside type="tip">
+   Si utilizas un dominio personalizado como `miapp.local`, recuerda añadirlo al archivo `hosts` de tu sistema apuntando a `127.0.0.1` o a la IP correspondiente.
+   </Aside>
+
+3. **Configurar el servidor de desarrollo:**
+
+   Utiliza los archivos generados en la configuración de tu servidor. Por ejemplo, con Node.js:
+
+   ```javascript
+   const https = require('https');
+   const fs = require('fs');
+
+   const options = {
+     key: fs.readFileSync('localhost+2-key.pem'),
+     cert: fs.readFileSync('localhost+2.pem')
+   };
+
+   https.createServer(options, (req, res) => {
+     res.writeHead(200);
+     res.end('Servidor HTTPS con certificado local');
+   }).listen(443);
+   ```
+
+</Steps>
+
+### Comandos útiles
+
+Consultar dónde se almacena la CA local:
+```bash
+mkcert -CAROOT
+```
+
+Desinstalar la CA local del sistema:
+```bash
+mkcert -uninstall
+```
+
+<CardGrid>
+  <LinkCard href="https://github.com/FiloSottile/mkcert" title="Repositorio mkcert" description="Código fuente y documentación oficial de mkcert." />
+  <LinkCard href="https://web.dev/articles/how-to-use-local-https" title="HTTPS en desarrollo local" description="Guía de web.dev sobre HTTPS en entornos locales." />
+</CardGrid>
