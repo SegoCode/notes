@@ -1,0 +1,34 @@
+---
+ Guía de estilo para la documentación
+ Frontmatter
+- **Título:** Corto y directo, entre 1 y 4 palabras. Si la página trata sobre una herramienta, usar su nombre propio (`Mkcert`, `Portainer`, `Syncthing`). Si describe una acción, usar infinitivo (`Instalar Git`, `Firmar los commits`).
+- **Descripción:** Una única frase en español que resuma el contenido de la página. Sin puntos suspensivos ni fórmulas genéricas.
+ Imports
+Todas las páginas utilizan la misma línea de importación completa, independientemente de los componentes que se usen:
+import { Card, CardGrid, LinkCard, Aside, Badge, Icon, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+Estructura de la página
+1. Párrafo introductorio: 1-3 frases directas tras el import, sin encabezado. Explica qué es o para qué sirve, sin fórmulas como "en esta guía veremos..." o "vamos a aprender...".
+2. Enlaces previos: Si existen requisitos o documentación oficial relevante, incluir un <LinkCard> antes del contenido principal.
+3. Secciones: Usar ### (h3) como nivel principal de encabezado. El title del frontmatter actúa como h1; no usar # ni ## en el cuerpo.
+4. Pasos: Envolver las instrucciones en bloques <Steps> con listas numeradas. Cada paso lleva un título en negrita seguido de dos puntos (1. **Título del paso:**).
+5. Cierre: Terminar con un <CardGrid> que contenga 2-4 <LinkCard> apuntando a documentación oficial o recursos relacionados.
+Tono y conjugación
+- Segunda persona del singular, modo imperativo: "Ejecuta", "Añade", "Configura", "Verifica". No usar infinitivo como instrucción ("Ejecutar el comando...") ni primera persona del plural ("Vamos a instalar...").
+- Presente de indicativo para descripciones y explicaciones: "Este comando elimina...", "Mkcert genera...", "La opción -U obliga a Maven a...".
+- Directo y sin relleno: Asumir que el lector es un desarrollador con contexto técnico. No explicar conceptos básicos (qué es una terminal, qué es un commit). Ir al grano.
+- Párrafos cortos: Máximo 3 frases por párrafo. Preferir una frase explicativa seguida del bloque de código.
+Componentes Starlight
+- <Aside> (sin tipo): Información complementaria o aclaratoria.
+- <Aside type="tip">: Recomendaciones y buenas prácticas.
+- <Aside type="caution">: Advertencias sobre acciones destructivas, irreversibles o configuraciones sensibles.
+- <Aside type="note">: Matices o aclaraciones puntuales.
+- Colocar los <Aside> dentro del paso al que hacen referencia, nunca como elementos sueltos entre secciones.
+Bloques de código
+- Incluir siempre el identificador de lenguaje:  ``bash ,  java `, ` xml ,  powershell `, ` dockerfile `, etc.
+- Comentarios dentro del código en español.
+- Los parámetros y flags relevantes se explican en el texto que rodea al bloque, no dentro del propio código.
+Idioma
+- Todo el contenido se redacta en español: títulos, descripciones, cuerpo, asides y comentarios de código.
+- Los términos técnicos se mantienen en inglés cuando son nombres propios o estándares reconocidos: "Conventional Commits", "annotation processing", "PATH", "settings.xml".
+- Nombres de herramientas siempre en su forma original: "IntelliJ IDEA", "MapStruct", "SDKMAN!", "GitHub Desktop".
+---
